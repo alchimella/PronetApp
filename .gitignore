@@ -1,7 +1,32 @@
+pronet-app/.DS_Store
+pronet-app/.thumbs.db
+pronet-app/node_modules
+
+# Quasar core related directories
+pronet-app/.quasar
+pronet-app//dist
+
+# Cordova related directories and files
+pronet-app//src-cordova/node_modules
+pronet-app//src-cordova/platforms
+pronet-app//src-cordova/plugins
+pronet-app//src-cordova/www
+
+# Capacitor related directories and files
+pronet-app//src-capacitor/www
+pronet-app//src-capacitor/node_modules
+
+# BEX related directories and files
+pronet-app//src-bex/www
+pronet-app//src-bex/js/core
+
+# Log files
+pronet-app/npm-debug.log*
+pronet-app/yarn-debug.log*
+pronet-app/yarn-error.log*
+
 # Editor directories and files
+pronet-app/.idea
+
 .idea
-.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+
