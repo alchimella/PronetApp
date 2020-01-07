@@ -1,4 +1,4 @@
 import Vue from 'vue'
-import axios from 'src/boot/axios'
+import axios from 'axios'
 
-Vue.prototype.$axios = axios
+Vue.prototype.$axios = axios;

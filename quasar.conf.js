@@ -26,7 +26,8 @@ module.exports = function (ctx) {
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
-      'material-icons' // optional, you are not bound to it
+      'material-icons', // optional, you are not bound to it
+      'fontawesome-v5'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
@@ -43,11 +44,25 @@ module.exports = function (ctx) {
       //            (not treeshaking Quasar; biggest bundle size; convenient)
       all: 'auto',
 
-      components: [],
-      directives: [],
+      components: [
+          'QBtn',
+          'QDialog',
+          'QInput',
+          'QList',
+          'QItem',
+          'QItemSection',
+          'QItemLabel',
+          'QSelect',
+          'QSpinnerPuff'
+      ],
+      directives: [
+          'ClosePopup'
+      ],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+          'Dialog'
+      ]
     },
 
     // https://quasar.dev/quasar-cli/cli-documentation/supporting-ie
@@ -73,7 +88,11 @@ module.exports = function (ctx) {
     devServer: {
       https: false,
       port: 8080,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
+        before (app) {
+            const cors = require('cors');
+            app.use(cors())
+        }
     },
 
     // animations: 'all', // --- includes all animations
