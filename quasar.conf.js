@@ -88,11 +88,7 @@ module.exports = function (ctx) {
     devServer: {
       https: false,
       port: 8080,
-      open: true, // opens browser window automatically
-        before (app) {
-            const cors = require('cors');
-            app.use(cors())
-        }
+      open: true // opens browser window automatically
     },
 
     // animations: 'all', // --- includes all animations

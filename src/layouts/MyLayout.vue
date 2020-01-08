@@ -55,6 +55,8 @@
                 </q-item>
                 <q-item>
                     <q-item-section>
+                        <p v-if="messageSuccessful" class="text-green">{{ messageSuccessful }}</p>
+                        <p v-if="messageError" class="text-red">{{ messageError }}</p>
                         <q-btn v-if="isActiveButton" color="blue-grey-3" label="Проверить соединение" @click="testConnection" />
                         <div v-if="isActiveSpinner" class="flex justify-center">
                             <q-spinner-puff
@@ -105,10 +107,12 @@
 
         data () {
             return {
-                server: 'web.pronet.kg',
-                port: '1092',
+                server: '',
+                port: '',
                 login: '',
                 password: '',
+                messageSuccessful: null,
+                messageError: null,
                 objects: null,
                 leftDrawerOpen: false,
                 rightDrawerOpen: false,
@@ -118,34 +122,69 @@
             }
         },
         methods: {
-            testConnection: function () {
+            testConnection: async function () {
                 console.log('TEST CONNECTION: ');
+
+                let options = {
+                    uri: 'http://' + this.server + ':' + this.port,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                };
+
                 this.isActiveButton = false;
                 this.isActiveSpinner = true;
-                this.$axios.get('http://' + this.server + ':' + this.port)
-                    .then(response => {
-                        console.log('RESPONSE: ', response);
-                        this.isActiveSpinner = false;
-                        this.isActiveButton = true;
-                    })
-                    .catch(error => {
-                        console.log('ERROR: ', error);
-                        this.isActiveSpinner = false;
-                        this.isActiveButton = true;
-                    })
+                this.messageSuccessful = null;
+                this.messageError = null;
+
+                try {
+                    let response = await this.$request(options);
+
+                    console.log('RESPONSE: ', response);
+                    this.isActiveSpinner = false;
+                    this.isActiveButton = true;
+                    this.messageSuccessful = 'Успешное соединение!';
+                } catch (e) {
+                    console.log('ERROR: ', e);
+                    this.isActiveSpinner = false;
+                    this.isActiveButton = true;
+                    this.messageError = 'Произошла ошибка при соединении с сервером!';
+                }
             },
-            save: function () {
-                console.log('TEST: ');
-                this.$axios.post('http://' + this.server + ':' + this.port, {
-                    login: this.login,
-                    password: this.password
-                })
-                    .then(response => {
-                        console.log('RESPONSE: ', response)
+            save: async function () {
+                let options = {
+                    method: 'POST',
+                    url: 'http://' + this.server + ':' + this.port,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    gzip: true,
+                    body: JSON.stringify({
+                        envelope: {
+                            header: {
+                                authenticationheader: {
+                                    username: 'pronet',
+                                    password: '123456'
+                                }
+                            },
+                            body: {
+                                logon: {
+                                    request: {
+                                        login: this.login,
+                                        password: this.password
+                                    }
+                                }
+                            }
+                        }
                     })
-                    .catch(error => {
-                        console.log('ERROR: ', error)
-                    })
+                };
+
+                try {
+                    let response = await this.$request(options);
+                    console.log(': ', response);
+                } catch (e) {
+                    console.log(': ', e);
+                }
             }
         }
     }
