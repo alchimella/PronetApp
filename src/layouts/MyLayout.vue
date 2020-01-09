@@ -39,37 +39,34 @@
             <q-list>
                 <q-item-label header>Настройки</q-item-label>
                 <q-item>
-                    <q-input class="full-width" v-model="server" label="Сервер" :rules="[val => val !== null && val !== '']" />
+                    <q-input class="full-width" v-model="server" label="Сервер" ref="server" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
                 <q-item>
-                    <q-input class="full-width" v-model="port" label="Порт" :rules="[val => val !== null && val !== '']" />
+                    <q-input class="full-width" v-model="port" label="Порт" ref="port" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
                 <q-item>
-                    <q-input class="full-width" v-model="login" label="Логин" :rules="[val => val !== null && val !== '']" />
+                    <q-input class="full-width" v-model="login" label="Логин" ref="login" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
                 <q-item>
-                    <q-input class="full-width" v-model="password" label="Пароль" :rules="[val => val !== null && val !== '']" />
+                    <q-input class="full-width" v-model="password" label="Пароль" ref="password" type="password" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
                 <q-item>
-                    <q-select class="full-width" v-model="objects" :options="options" label="Объект" />
+                    <q-select class="full-width" v-model="objects" :options="options" label="Объект" :disable="!isActiveSelect" />
                 </q-item>
                 <q-item>
                     <q-item-section>
                         <p v-if="messageSuccessful" class="text-green">{{ messageSuccessful }}</p>
                         <p v-if="messageError" class="text-red">{{ messageError }}</p>
+
                         <q-btn v-if="isActiveButton" color="blue-grey-3" label="Проверить соединение" @click="testConnection" />
                         <div v-if="isActiveSpinner" class="flex justify-center">
-                            <q-spinner-puff
-                                color="primary"
-                                size="3em"
-                            />
-                            <q-tooltip :offset="[0, 8]">QSpinnerPuff</q-tooltip>
+                            <q-spinner-puff color="primary" size="3em"/>
                         </div>
                     </q-item-section>
                 </q-item>
                 <q-item>
                     <q-item-section>
-                        <q-btn color="primary" label="Сохранить" @click="save" />
+                        <q-btn v-if="isActiveButton" color="primary" label="Сохранить" @click="save" />
                     </q-item-section>
                 </q-item>
             </q-list>
@@ -107,10 +104,10 @@
 
         data () {
             return {
-                server: '',
-                port: '',
-                login: '',
-                password: '',
+                server: 'web.pronet.kg',
+                port: '1092',
+                login: 'admin',
+                password: 'qq',
                 messageSuccessful: null,
                 messageError: null,
                 objects: null,
@@ -118,12 +115,20 @@
                 rightDrawerOpen: false,
                 isActiveButton: true,
                 isActiveSpinner: false,
+                isActiveSelect: false,
                 options: []
             }
         },
         methods: {
             testConnection: async function () {
-                console.log('TEST CONNECTION: ');
+                console.log('Запушен процесс проверки соединения');
+
+                this.$refs.server.validate();
+                this.$refs.port.validate();
+
+                if (this.$refs.server.hasError || this.$refs.port.hasError) {
+                    this.formHasError = true
+                }
 
                 let options = {
                     uri: 'http://' + this.server + ':' + this.port,
@@ -138,20 +143,34 @@
                 this.messageError = null;
 
                 try {
-                    let response = await this.$request(options);
+                    await this.$request(options);
 
-                    console.log('RESPONSE: ', response);
+                    console.log('Соединение с сервером прошло успешно!');
+
                     this.isActiveSpinner = false;
                     this.isActiveButton = true;
                     this.messageSuccessful = 'Успешное соединение!';
                 } catch (e) {
-                    console.log('ERROR: ', e);
+                    console.log('Произошла ошибка при соединении с сервером: ', e);
+
                     this.isActiveSpinner = false;
                     this.isActiveButton = true;
                     this.messageError = 'Произошла ошибка при соединении с сервером!';
                 }
             },
             save: async function () {
+                console.log('Запушен процесс авторизации');
+
+                this.$refs.server.validate();
+                this.$refs.port.validate();
+                this.$refs.login.validate();
+                this.$refs.password.validate();
+
+                if (this.$refs.server.hasError || this.$refs.port.hasError || this.$refs.login.hasError || this.$refs.password.hasError) {
+                    this.formHasError = true;
+                    return;
+                }
+
                 let options = {
                     method: 'POST',
                     url: 'http://' + this.server + ':' + this.port,
@@ -179,11 +198,34 @@
                     })
                 };
 
+                this.isActiveButton = false;
+                this.isActiveSpinner = true;
+
                 try {
                     let response = await this.$request(options);
-                    console.log(': ', response);
+
+                    let isSuccess = JSON.parse(response).envelope.body.logon.response.auth_result.success;
+                    console.log('Результат запроса: ', response);
+
+                    this.isActiveSpinner = false;
+                    this.isActiveButton = true;
+
+                    if (isSuccess) {
+                        this.isActiveSelect = true;
+                        this.messageSuccessful = 'Успешно авторизирован!';
+                        this.messageError = false;
+                    } else {
+                        console.log('Произошла ошибка при авторизации. Неправильный логин или пароль');
+                        this.isActiveSelect = false;
+                        this.messageSuccessful = false;
+                        this.messageError = 'Неправильный логин или пароль!';
+                    }
                 } catch (e) {
-                    console.log(': ', e);
+                    console.log('Произошла ошибка при соединении с сервером: ', e);
+
+                    this.isActiveSpinner = false;
+                    this.isActiveButton = true;
+                    this.messageError = 'Произошла ошибка при соединении с сервером!';
                 }
             }
         }
