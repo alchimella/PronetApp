@@ -11,26 +11,31 @@
                 </q-card-section>
 
                 <q-card-section>
-                    <q-input dense v-model="code" autofocus @keyup.enter="prompt = false" :rules="[val => val !== null && val !== '']" />
+                    <q-input dense v-model="code" autofocus @keyup.enter="prompt = false" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-card-section>
 
                 <q-card-actions align="right" class="text-primary">
                     <q-btn label="Отмена" color="white" text-color="black" v-close-popup />
-                    <q-btn label="Ввод" color="primary" @click="onOKClick" />
+                    <q-btn label="Ввод" color="primary" @click="enter" v-close-popup="code" />
                 </q-card-actions>
             </q-card>
         </q-dialog>
+        <div v-if="isActiveSpinner" class="flex justify-center full-width q-mt-xl">
+            <q-spinner-puff color="primary" size="3em"/>
+        </div>
+        <p v-if="isInfo" class="flex justify-center full-width q-mt-xl">{{ message }}</p>
+        <p v-if="isError" class="flex justify-center full-width q-mt-xl text-red-6">{{ message }}</p>
         <div v-show="isResult" class="flex full-width q-mt-xl">
-            <q-list class="full-width" v-for="(index, item) in ticket" :key="index" bordered separator>
+            <q-list class="full-width" v-for="item in ticket" :key="item._idrref" bordered separator>
                 <q-item v-ripple>
                     <q-item-section>
                         <q-item-label>Статус</q-item-label>
                     </q-item-section>
 
                     <q-item-section side center>
-                        <q-item-label>
-                            <q-icon name="fas fa-check-circle" color="green" style="font-size: 1.4em;" />
-                        </q-item-label>
+<!--                        <q-badge color="secondary">-->
+<!--                            #4D96F2-->
+<!--                        </q-badge>-->
                     </q-item-section>
                 </q-item>
 
@@ -66,7 +71,7 @@
             </q-list>
         </div>
         <div v-show="isResult" class="flex justify-between full-width q-mt-xl">
-            <q-btn label="Отмена" color="white" text-color="black" />
+            <q-btn label="Отмена" color="white" text-color="black" @click="isResult = false" />
             <q-btn label="Ок" color="secondary" @click="alert = true" />
         </div>
         <q-dialog v-model="alert">
@@ -87,7 +92,6 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-
     </q-page>
 </template>
 
@@ -99,8 +103,12 @@
                 alert: false,
                 prompt: false,
                 code: '',
+                message: '',
                 isResult: false,
-                ticket: false
+                ticket: false,
+                isActiveSpinner: false,
+                isError: false,
+                isInfo: false
             }
         },
         methods: {
@@ -131,8 +139,84 @@
                     }
                 )
             },
-            onOKClick () {
-                if (this.code) this.isResult = true
+            enter: async function () {
+                console.log('Запушен процесс отправки запроса по талону');
+
+                let server = localStorage.getItem('server');
+                let port = localStorage.getItem('port');
+
+                if (!server || !port) {
+                    console.log('Пользователь не авторизирован!');
+
+                    this.isActiveSpinner = false;
+                    this.isInfo = true;
+                    this.message = 'Необходимо авторизироваться!';
+
+                    return
+                }
+
+                this.isActiveSpinner = true;
+                this.isResult = false;
+                this.isInfo = false;
+                this.isError = false;
+
+                if (this.code) {
+                    let options = {
+                        method: 'post',
+                        url: 'http://' + server + ':' + port,
+                        data: {
+                            envelope: {
+                                header: {
+                                    authenticationheader: {
+                                        username: 'pronet',
+                                        password: '123456'
+                                    }
+                                },
+                                body: {
+                                    fill: {
+                                        request: {
+                                            query: 'select * from _reference1 where _code = ' + this.code
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    this.$axios(options)
+                        .then(response => {
+                            console.log('response: ', response);
+
+                            let data = response.data.envelope.body.response.data;
+
+                            if (data.length) {
+                                console.log('Найден талон с номером - ' + this.code, data);
+
+                                alert(JSON.stringify(data));
+
+                                this.isResult = true;
+                                this.code = '';
+                                this.ticket = data;
+                                this.isActiveSpinner = false;
+                            } else {
+                                console.log('Талонов с кодом - ' + this.code + ' не найдено!');
+
+                                this.isActiveSpinner = false;
+                                this.isInfo = true;
+                                this.message = 'Совпадений не найдено!'
+                            }
+                        })
+                        .catch(err => {
+                            console.log('Произошла ошибка при поиске талона: ', err);
+
+                            this.isActiveSpinner = false;
+                            this.isError = true;
+                            this.message = 'Произошла ошибка при поиске талона!'
+                        })
+                }
+            },
+            post: function () {
+
             }
         }
     }

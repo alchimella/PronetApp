@@ -45,13 +45,14 @@ module.exports = function (ctx) {
       all: 'auto',
 
       components: [
+          'QBadge',
           'QBtn',
           'QDialog',
           'QInput',
-          'QList',
           'QItem',
-          'QItemSection',
           'QItemLabel',
+          'QItemSection',
+          'QList',
           'QSelect',
           'QSpinnerPuff'
       ],

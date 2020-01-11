@@ -107,7 +107,7 @@
                 server: 'web.pronet.kg',
                 port: '1092',
                 login: 'admin',
-                password: 'qq',
+                password: 'SVPmySunz1',
                 messageSuccessful: null,
                 messageError: null,
                 objects: null,
@@ -131,10 +131,8 @@
                 }
 
                 let options = {
-                    uri: 'http://' + this.server + ':' + this.port,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    method: 'get',
+                    url: 'http://' + this.server + ':' + this.port,
                 };
 
                 this.isActiveButton = false;
@@ -142,21 +140,21 @@
                 this.messageSuccessful = null;
                 this.messageError = null;
 
-                try {
-                    await this.$request(options);
+                this.$axios(options)
+                    .then(response => {
+                        console.log('Соединение с сервером прошло успешно!', response);
 
-                    console.log('Соединение с сервером прошло успешно!');
+                        this.isActiveSpinner = false;
+                        this.isActiveButton = true;
+                        this.messageSuccessful = 'Успешное соединение!';
+                    })
+                    .catch(err => {
+                        console.log('Произошла ошибка при соединении с сервером: ', err);
 
-                    this.isActiveSpinner = false;
-                    this.isActiveButton = true;
-                    this.messageSuccessful = 'Успешное соединение!';
-                } catch (e) {
-                    console.log('Произошла ошибка при соединении с сервером: ', e);
-
-                    this.isActiveSpinner = false;
-                    this.isActiveButton = true;
-                    this.messageError = 'Произошла ошибка при соединении с сервером!';
-                }
+                        this.isActiveSpinner = false;
+                        this.isActiveButton = true;
+                        this.messageError = 'Произошла ошибка при соединении с сервером!';
+                    })
             },
             save: async function () {
                 console.log('Запушен процесс авторизации');
@@ -172,13 +170,9 @@
                 }
 
                 let options = {
-                    method: 'POST',
+                    method: 'post',
                     url: 'http://' + this.server + ':' + this.port,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    gzip: true,
-                    body: JSON.stringify({
+                    data: {
                         envelope: {
                             header: {
                                 authenticationheader: {
@@ -195,38 +189,63 @@
                                 }
                             }
                         }
-                    })
+                    }
                 };
 
                 this.isActiveButton = false;
                 this.isActiveSpinner = true;
 
-                try {
-                    let response = await this.$request(options);
+                this.$axios(options)
+                    .then(response => {
+                        let isSuccess = response.data.envelope.body.logon.response.auth_result.success;
 
-                    let isSuccess = JSON.parse(response).envelope.body.logon.response.auth_result.success;
-                    console.log('Результат запроса: ', response);
+                        console.log('Результат запроса: ', response);
 
-                    this.isActiveSpinner = false;
-                    this.isActiveButton = true;
+                        this.isActiveSpinner = false;
+                        this.isActiveButton = true;
 
-                    if (isSuccess) {
-                        this.isActiveSelect = true;
-                        this.messageSuccessful = 'Успешно авторизирован!';
-                        this.messageError = false;
-                    } else {
-                        console.log('Произошла ошибка при авторизации. Неправильный логин или пароль');
-                        this.isActiveSelect = false;
-                        this.messageSuccessful = false;
-                        this.messageError = 'Неправильный логин или пароль!';
-                    }
-                } catch (e) {
-                    console.log('Произошла ошибка при соединении с сервером: ', e);
+                        if (isSuccess) {
+                            this.isActiveSelect = true;
+                            this.messageSuccessful = 'Успешно авторизирован!';
+                            this.messageError = false;
 
-                    this.isActiveSpinner = false;
-                    this.isActiveButton = true;
-                    this.messageError = 'Произошла ошибка при соединении с сервером!';
-                }
+                            localStorage.setItem('server', this.server);
+                            localStorage.setItem('port', this.port);
+                        } else {
+                            console.log('Произошла ошибка при авторизации. Неправильный логин или пароль');
+
+                            this.isActiveSelect = false;
+                            this.messageSuccessful = false;
+                            this.messageError = 'Неправильный логин или пароль!';
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Произошла ошибка при соединении с сервером: ', err);
+
+                        this.isActiveSpinner = false;
+                        this.isActiveButton = true;
+                        this.messageError = 'Произошла ошибка при соединении с сервером!';
+                    })
+            }
+        },
+        mounted() {
+            let server = localStorage.getItem('server');
+            let port = localStorage.getItem('port');
+
+            if (!server || !port) {
+                console.log('Пользователь не авторизирован!');
+
+                this.isActiveSelect = false;
+                this.isActiveSpinner = false;
+                this.isActiveButton = true;
+                this.messageSuccessful = false;
+                this.messageError = 'Необходимо авторизироваться!';
+            } else {
+                this.isActiveSelect = true;
+                this.messageError = false;
+                this.isActiveButton = true;
+                this.isActiveSpinner = false;
+                this.messageSuccessful = 'Успешно авторизирован!';
             }
         }
     }
