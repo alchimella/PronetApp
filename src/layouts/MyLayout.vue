@@ -136,8 +136,8 @@
                 isActiveSpinner: false,
                 isActiveRegistrateSpinner: false,
                 isActiveSelect: false,
-                objects: [],
-                deviceId: device.uuid
+                objects: []
+                // deviceId: device.uuid
             }
         },
         methods: {

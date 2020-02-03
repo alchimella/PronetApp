@@ -31,8 +31,8 @@
             <div v-show="isResult" class="flex row wrap justify-between full-width q-mt-xl">
                 <q-card v-for="item in ticket" :key="item._idrref" v-if="parseFloat(item._accumreg1_amount) > 0" @click="getItem(item)" class="col-xs-5 col-sm-5 col-md-5 q-ma-sm q-pa-sm">
                     <q-card-section class="text-overline">{{ item._reference1_code }}</q-card-section>
-                    <q-card-section class="flex justify-center text-h4">{{ item._reference14_name }}</q-card-section>
-                    <q-card-section class="flex justify-center text-subtitle1">{{ item._accumreg1_amount }}</q-card-section>
+                    <q-card-section class="flex justify-center text-h6">{{ item._reference14_name }}</q-card-section>
+                    <q-card-section class="flex justify-center" style="font-size: 4vh;">{{ item._accumreg1_amount }}</q-card-section>
                 </q-card>
             </div>
 
