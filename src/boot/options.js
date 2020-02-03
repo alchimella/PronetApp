@@ -49,16 +49,39 @@ export function buildPackRequest(params) {
                         'package': [
                             {
                                 'database_name': 'loy_db',
-                                'table_name': '_reference13',
+                                'table_name': '_accumreg1',
                                 'auto_guid': [{ 'field_name': '_idrref' }],
                                 'auto_increment': [{ 'field_name': '_code' }],
                                 'auto_timestamp': [{ 'field_name': '_timestamp' }],
-                                'row': [{ 'field': [{ 'field_name': '_name', 'field_value': params.deviceId }, { 'field_name': '_reference12', 'field_value': params.model }] }]
+                                'row': [
+                                    {
+                                        'field': [
+                                            { 'field_name': '_date_time', 'field_value': params.date },
+                                            { 'field_name': '_reference1_idrref', 'field_value': params._reference1_idrref },
+                                            { 'field_name': '_reference14_idrref', 'field_value': params._reference14_idrref },
+                                            { 'field_name': '_reference13_idrref', 'field_value': params._reference13_idrref },
+                                            { 'field_name': '_amount', 'field_value': '-' + params.amount }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
                 }
             }
+        }
+    }
+}
+
+export function getCardRequest(params) {
+    if (!params) {
+        console.log('Передан пустой параметр params');
+    }
+
+    return {
+        envelope: {
+            header: buildHeader(),
+            body: { get_card: { request: { '_name': params } } }
         }
     }
 }

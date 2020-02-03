@@ -21,90 +21,44 @@
                     </q-card-actions>
                 </q-card>
             </q-dialog>
+
             <div v-if="isActiveSpinner" class="flex justify-center full-width q-mt-xl">
                 <q-spinner-puff color="primary" size="3em"/>
             </div>
             <p v-if="isInfo" class="flex justify-center full-width q-mt-xl">{{ message }}</p>
             <p v-if="isError" class="flex justify-center full-width q-mt-xl text-red-6">{{ message }}</p>
-            <div v-show="isResult" class="flex full-width q-mt-xl">
-                <q-list class="full-width" v-for="item in ticket" :key="item._idrref" bordered separator>
-                    <q-item v-ripple>
-                        <q-item-section>
-                            <q-item-label>Статус</q-item-label>
-                        </q-item-section>
 
-                        <q-item-section side center>
-    <!--                        <q-badge color="secondary">-->
-    <!--                            #4D96F2-->
-    <!--                        </q-badge>-->
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-ripple>
-                        <q-item-section>
-                            <q-item-label>Номинал</q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side center>
-                            <q-item-label>{{ item.rated }}</q-item-label>
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-ripple>
-                        <q-item-section>
-                            <q-item-label>Вид топлива</q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side center>
-                            <q-item-label>{{ item.gaz }}</q-item-label>
-                        </q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-ripple>
-                        <q-item-section>
-                            <q-item-label>Код</q-item-label>
-                        </q-item-section>
-
-                        <q-item-section side center>
-                            <q-item-label>{{ item.code }}</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
+            <div v-show="isResult" class="flex row wrap justify-between full-width q-mt-xl">
+                <q-card v-for="item in ticket" :key="item._idrref" v-if="parseFloat(item._accumreg1_amount) > 0" @click="getItem(item)" class="col-xs-5 col-sm-5 col-md-5 q-ma-sm q-pa-sm">
+                    <q-card-section class="text-overline">{{ item._reference1_code }}</q-card-section>
+                    <q-card-section class="flex justify-center text-h4">{{ item._reference14_name }}</q-card-section>
+                    <q-card-section class="flex justify-center text-subtitle1">{{ item._accumreg1_amount }}</q-card-section>
+                </q-card>
             </div>
-            <div v-show="isResult" class="flex justify-between full-width q-mt-xl">
-                <q-btn label="Отмена" color="white" text-color="black" @click="isResult = false" />
-                <q-btn label="Ок" color="secondary" @click="alert = true" />
-            </div>
+
             <q-dialog v-model="alert">
                 <q-card style="width: 40vh">
                     <q-card-section class="flex justify-center">
-                        <div class="text-h6">Успешно</div>
+                        <div class="text-h5">{{ test._reference14_name }} - {{ test._accumreg1_amount }}</div>
                     </q-card-section>
 
                     <q-card-section>
-                        <q-item-label class="flex justify-center q-mb-md">
-                            <q-icon name="far fa-check-circle" color="green" style="font-size: 6em;" />
-                        </q-item-label>
-                        <q-item-label class="flex justify-center">Транзакция прошла успешно!</q-item-label>
+                        <q-item-label class="flex justify-center">Вы уверены что хотите списать данный талон?</q-item-label>
                     </q-card-section>
 
-                    <q-card-actions align="right">
-                        <q-btn flat label="OK" color="primary" v-close-popup />
+                    <q-card-actions align="between">
+                        <q-btn label="Отмена" color="white" text-color="black" @click="isResult = false" v-close-popup />
+                        <q-btn label="Ок" color="secondary" @click="deductOfCoupon(test)" v-close-popup="isDeducted" />
                     </q-card-actions>
                 </q-card>
             </q-dialog>
         </div>
-        <!-- <div class="flex row justify-end full-width">
-            <q-badge color="secondary" style="font-size: 1.3em; line-hight: 18px;">online</q-badge>
-        </div> -->
-        <!-- <div class="flex row justify-end full-width">
-            <q-badge color="red" style="font-size: 1.3em; line-hight: 18px;">offline</q-badge>
-        </div> -->
     </q-page>
 </template>
 
 <script>
-    import { buildFillRequest } from '../boot/options';
+    import moment from 'moment'
+    import { getCardRequest, buildPackRequest } from '../boot/options';
 
     export default {
         name: 'Ticket',
@@ -118,7 +72,10 @@
                 ticket: false,
                 isActiveSpinner: false,
                 isError: false,
-                isInfo: false
+                isInfo: false,
+                test: '',
+                isDeducted: false,
+                date: moment().format('YYYY-MM-DD hh:mm:ss')
             }
         },
         methods: {
@@ -127,17 +84,12 @@
 
                 cordova.plugins.barcodeScanner.scan(
                     function (result) {
-                        alert('We got a barcode\n' +
-                            'Result: ' + result.text + '\n' +
-                            'Format: ' + result.format + '\n' +
-                            'Cancelled: ' + result.cancelled);
-
                         let url = _this.checkAuth();
 
                         _this.post(url, result.text);
                     },
                     function (error) {
-                        alert('Scanning failed: ' + error)
+                        // alert('Scanning failed: ' + error)
                     },
                     {
                         preferFrontCamera: false, // iOS and Android
@@ -167,6 +119,11 @@
 
                 this.post(url, this.code);
             },
+            getItem: function (item) {
+                this.alert = true;
+
+                this.test = item;
+            },
             checkAuth: function () {
                 let server = localStorage.getItem('server');
                 let port = localStorage.getItem('port');
@@ -190,8 +147,8 @@
                 return { server, port }
             },
             post: function (url, code) {
-                let query = 'select * from _reference1 where _name = ' + code;
-                let envelope = buildFillRequest(query);
+                // let query = 'select * from _reference1 where _name = ' + code;
+                let envelope = getCardRequest(code);
 
                 if (code) {
                     let options = {
@@ -208,8 +165,6 @@
 
                             if (data.length) {
                                 console.log('Найден талон с номером - ' + code, data);
-
-                                alert(JSON.stringify(data));
 
                                 this.isResult = true;
                                 this.code = '';
@@ -231,13 +186,54 @@
                             this.message = 'Произошла ошибка при поиске талона!'
                         })
                 }
+            },
+
+            deductOfCoupon: function (item) {
+                let server = localStorage.getItem('server');
+                let port = localStorage.getItem('port');
+                this.$q.loading.show({
+                    delay: 400 // ms
+                });
+
+                console.log('FLOAT: ', parseFloat(item._accumreg1_amount));
+
+                let params = {
+                    date: moment().format('YYYY-MM-DD hh:mm:ss'),
+                    _reference1_idrref: item._reference1_idrref,
+                    _reference14_idrref: item._reference14_idrref,
+                    _reference13_idrref: localStorage.getItem('deviceId').toLowerCase(),
+                    amount: parseFloat(item._accumreg1_amount)
+                };
+
+                console.log('params: ', params);
+
+                let envelope = buildPackRequest(params);
+                let options = {
+                    method: 'post',
+                    url: 'http://' + server + ':' + port,
+                    data: envelope
+                };
+
+                this.$axios(options)
+                    .then(res => {
+                        console.log('RES: ', res);
+
+                        this.isDeducted = true;
+                        this.$router.push('/');
+                        this.$q.loading.hide()
+                    })
+                    .catch(err => {
+                        console.log('Произошла ошибка при списании талона: ', err);
+
+                        this.isActiveSpinner = false;
+                        this.isError = true;
+                        this.message = 'Произошла ошибка при списании талона!'
+                    })
             }
         }
     }
 </script>
 
 <style scoped>
-    body {
-        padding-top: 20px;
-    }
+
 </style>

@@ -221,6 +221,8 @@
 
                             localStorage.setItem('server', this.server);
                             localStorage.setItem('port', this.port);
+                            localStorage.setItem('login', this.login);
+                            localStorage.setItem('password', this.password);
                         } else {
                             console.log('Произошла ошибка при авторизации. Неправильный логин или пароль');
 
@@ -274,6 +276,7 @@
                             this.isActiveRegistrateButton = true;
                             this.messageRegistrateError = false;
                             this.messageRegistrateSuccessful = 'Устройство успешно зарегистрировано!';
+                            localStorage.setItem('deviceId', this.deviceId);
                             localStorage.setItem('model', this.model);
                         })
                         .catch(err => {
@@ -317,6 +320,8 @@
         mounted() {
             let server = localStorage.getItem('server');
             let port = localStorage.getItem('port');
+            let login = localStorage.getItem('login');
+            let password = localStorage.getItem('password');
             let objects = JSON.parse(localStorage.getItem('objects'));
             let model = localStorage.getItem('model');
 
@@ -340,6 +345,10 @@
                 this.messageSuccessful = false;
                 this.messageError = 'Необходимо авторизироваться!';
             } else {
+                this.server = server;
+                this.port = port;
+                this.login = login;
+                this.password = password;
                 this.isActiveSelect = true;
                 this.isActiveRegistrateButton = true;
                 this.messageError = false;

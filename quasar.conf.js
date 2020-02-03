@@ -47,6 +47,9 @@ module.exports = function (ctx) {
       components: [
           'QBadge',
           'QBtn',
+          'QCard',
+          'QCardSection',
+          'QCardActions',
           'QDialog',
           'QInput',
           'QItem',
@@ -62,8 +65,12 @@ module.exports = function (ctx) {
 
       // Quasar plugins
       plugins: [
-          'Dialog'
-      ]
+          'Dialog',
+          'Loading'
+      ],
+      config: {
+          loading: { /* Loading defaults */ }
+      }
     },
 
     // https://quasar.dev/quasar-cli/cli-documentation/supporting-ie
