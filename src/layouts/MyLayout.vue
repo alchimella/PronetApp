@@ -1,8 +1,9 @@
 <template>
     <q-layout view="lHh Lpr lFf">
-        <q-header elevated>
+        <q-header bordered>
             <q-toolbar class="flex row justify-between">
                 <q-btn
+                    v-if="isCashier"
                     flat
                     dense
                     round
@@ -31,8 +32,33 @@
             bordered
             content-class="bg-grey-2"
         >
+            <q-list class="q-pa-sm">
+                <q-item-label header class="text-h6">Авторизация</q-item-label>
+                <q-item>
+                    <q-input class="full-width" v-model="server" label="Сервер" ref="server" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
+                </q-item>
+                <q-item>
+                    <q-input class="full-width" v-model="port" label="Порт" ref="port" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
+                </q-item>
+                <q-item>
+                    <q-input class="full-width" v-model="comment" label="Комментарий" type="textarea" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
+                </q-item>
+                <q-item>
+                    <q-btn v-if="isActiveButton" color="primary" label="Авторизироваться" @click="auth" />
+                </q-item>
+            </q-list>
+        </q-drawer>
+
+        <q-drawer
+            v-if="isCashier"
+            side="right"
+            v-model="rightDrawerOpen"
+            show-if-above
+            bordered
+            content-class="bg-grey-2"
+        >
             <q-list>
-                <q-item-label header>Настройки</q-item-label>
+                <q-item-label header class="text-h6">Настройки</q-item-label>
                 <q-item>
                     <q-input class="full-width" v-model="server" label="Сервер" ref="server" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
@@ -87,6 +113,7 @@
         </q-drawer>
 
         <q-drawer
+            v-if="isCashier"
             side="left"
             v-model="leftDrawerOpen"
             show-if-above
@@ -107,7 +134,8 @@
         </q-drawer>
 
         <q-page-container>
-            <router-view />
+            <router-view v-if="isUser" :isUser="isUser" style="background: url('../statics/background.png'); background-size: cover;"/>
+            <router-view v-else :isUser="isUser" />
         </q-page-container>
     </q-layout>
 </template>
@@ -124,6 +152,9 @@
                 port: '',
                 login: '',
                 password: '',
+                comment: '',
+                isUser: true,
+                isCashier: false,
                 messageSuccessful: null,
                 messageError: null,
                 messageRegistrateSuccessful: null,
@@ -141,6 +172,11 @@
             }
         },
         methods: {
+            auth: function () {
+                this.isUser = false;
+                this.isCashier = true;
+            },
+
             testConnection: async function () {
                 console.log('Запушен процесс проверки соединения');
 
@@ -301,6 +337,7 @@
 
                 try {
                     let response = await this.$axios(options);
+                    console.log(': ', response);
                     let data = response.data.envelope.body.response.data;
 
                     data.map(item => {
