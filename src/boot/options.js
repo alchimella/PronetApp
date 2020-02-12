@@ -1,10 +1,21 @@
-import Vue from 'vue'
-
 function buildHeader() {
     return {
         authenticationheader: {
             username: 'pronet',
             password: '123456'
+        }
+    }
+}
+
+export function buildRegTRequest(params) {
+    if (!params) {
+        console.log('Передан пустой параметр params');
+    }
+
+    return {
+        envelope: {
+            header: buildHeader(),
+            body: { reg_t: { request: { _cid: params.deviceId, _name: params.comment } } }
         }
     }
 }
@@ -27,10 +38,12 @@ export function buildFillRequest(query) {
         console.log('Передан пустой параметр query');
     }
 
+    console.log('query: ', query);
+
     return {
         envelope: {
             header: buildHeader(),
-            body: { fill: { request: { query } } }
+            body: { cmd: { request: { fill: { query: query } } } }
         }
     }
 }

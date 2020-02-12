@@ -35,16 +35,19 @@
             <q-list class="q-pa-sm">
                 <q-item-label header class="text-h6">Авторизация</q-item-label>
                 <q-item>
-                    <q-input class="full-width" v-model="server" label="Сервер" ref="server" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
-                </q-item>
-                <q-item>
-                    <q-input class="full-width" v-model="port" label="Порт" ref="port" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
+                    <q-input class="full-width" v-model="url" label="URL" ref="url" :rules="[val => val && val.length > 0 || 'Заполните поле']" placeholder="Сервер:Порт" />
                 </q-item>
                 <q-item>
                     <q-input class="full-width" v-model="comment" label="Комментарий" type="textarea" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
                 <q-item>
-                    <q-btn v-if="isActiveButton" color="primary" label="Авторизироваться" @click="auth" />
+                    <q-badge v-if="status && color" outline class="text-body1" :color="color" :label="status" />
+                </q-item>
+                <div v-if="isActiveRegistrateSpinner" class="flex justify-center">
+                    <q-spinner-puff color="primary" size="3em"/>
+                </div>
+                <q-item>
+                    <q-btn v-if="isActiveButton" color="primary" label="Авторизироваться" @click="terminalRegistration" />
                 </q-item>
             </q-list>
         </q-drawer>
@@ -134,25 +137,28 @@
         </q-drawer>
 
         <q-page-container>
-            <router-view v-if="isUser" :isUser="isUser" style="background: url('../statics/background.png'); background-size: cover;"/>
+            <router-view v-if="isUser" :isUser="isUser" class="background"/>
             <router-view v-else :isUser="isUser" />
         </q-page-container>
     </q-layout>
 </template>
 
 <script>
-    import { buildLogonRequest, buildFillRequest, buildPackRequest } from '../boot/options';
+    import { buildRegTRequest, buildLogonRequest, buildFillRequest, buildPackRequest } from '../boot/options';
 
     export default {
         name: 'MyLayout',
 
         data () {
             return {
+                url: localStorage.url,
                 server: '',
                 port: '',
                 login: '',
                 password: '',
-                comment: '',
+                comment: localStorage.comment,
+                status: localStorage.status,
+                color: localStorage.color,
                 isUser: true,
                 isCashier: false,
                 messageSuccessful: null,
@@ -167,14 +173,47 @@
                 isActiveSpinner: false,
                 isActiveRegistrateSpinner: false,
                 isActiveSelect: false,
-                objects: []
-                // deviceId: device.uuid
+                objects: [],
+                deviceId: device.uuid,
+                test: ''
             }
         },
         methods: {
-            auth: function () {
-                this.isUser = false;
-                this.isCashier = true;
+            terminalRegistration: function () {
+                console.log('Запушен процесс регистрации терминала');
+
+                this.$refs.url.validate();
+                this.isActiveRegistrateSpinner = true;
+                this.isActiveButton = false;
+
+                let params = { deviceId: this.deviceId, comment: this.comment };
+                let envelope = buildRegTRequest(params);
+
+                if (this.$refs.url.hasError) this.formHasError = true;
+
+                let options = {
+                    method: 'post',
+                    url: 'http://' + this.url,
+                    data: envelope
+                };
+
+                this.$axios(options)
+                    .then(response => {
+                        console.log('Запрос на регистрацию терминала прошел успешно. Ожидается подтверждение!', response);
+
+                        let idrref = response.data.envelope.body.response.data[0]._idrref;
+                        localStorage.idrref = idrref;
+                        localStorage.url = this.url;
+                        localStorage.comment = this.comment;
+                        this.getStatus(idrref);
+                    })
+                    .catch(err => {
+                        console.log('Произошла ошибка при регистрации терминала: ', err);
+                        this.isActiveRegistrateSpinner = false;
+                        this.isActiveButton = true;
+                    });
+
+                this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
             },
 
             testConnection: async function () {
@@ -337,12 +376,12 @@
 
                 try {
                     let response = await this.$axios(options);
-                    console.log(': ', response);
                     let data = response.data.envelope.body.response.data;
 
-                    data.map(item => {
-                        let result = { label: item._name, value: item._idrref };
-                        this.objects.push(result);
+                    let _this = this;
+                    data.forEach(function(item) {
+                        let res = { label: item._name, value: item._idrref };
+                        _this.objects.push(res);
                     });
 
                     localStorage.setItem('objects', JSON.stringify(this.objects));
@@ -352,6 +391,65 @@
                     this.isError = true;
                     this.message = 'Произошла ошибка при загрузке объектов!'
                 }
+            },
+
+            getStatus: function (idrref) {
+                let query = `select * from _reference13 where _idrref = '${idrref}'`;
+                let envelope = buildFillRequest(query);
+
+                let options = {
+                    method: 'post',
+                    url: 'http://' + this.url,
+                    data: envelope
+                };
+
+                let vm = this;
+
+                this.$axios(options)
+                    .then(response => {
+                        let res = response.data.envelope.body.response.data[0]._status;
+
+                        if (res == 0) {
+                            vm.status = 'В ожидании';
+                            vm.color = 'orange';
+                            localStorage.status = vm.status;
+                            localStorage.color = vm.color;
+                        }
+                        if (res == 1) {
+                            vm.status = 'Принято';
+                            vm.color = 'green';
+                            clearInterval(vm.test);
+                            localStorage.isUser = false;
+                            localStorage.isCashier = true;
+                            vm.isUser = false;
+                            vm.isCashier = true;
+                        }
+                        if (res == 2) {
+                            vm.status = 'Отклонено';
+                            vm.color = 'red';
+                            clearInterval(vm.test);
+                            localStorage.status = vm.status;
+                            localStorage.color = vm.color;
+                        }
+
+                        this.isActiveRegistrateSpinner = false;
+                        this.isActiveButton = true;
+                    })
+                    .catch(err => {
+                        console.log('Произошла ошибка при запросе статуса терминала: ', err);
+                    })
+            }
+        },
+        created() {
+            if (localStorage.isCashier) {
+                this.isUser = false;
+                this.isCashier = true;
+            }
+
+            if (this.url.length && this.isUser && !localStorage.isCashier) {
+                this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
+            } else {
+                clearInterval();
             }
         },
         mounted() {
@@ -397,3 +495,11 @@
         }
     }
 </script>
+
+<style scoped>
+    .background {
+        background: url("../statics/background.png");
+        background-size: cover;
+    }
+
+</style>
