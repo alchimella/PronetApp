@@ -35,7 +35,7 @@
             <q-list class="q-pa-sm">
                 <q-item-label header class="text-h6">Авторизация</q-item-label>
                 <q-item>
-                    <q-input class="full-width" v-model="url" label="URL" ref="url" :rules="[val => val && val.length > 0 || 'Заполните поле']" placeholder="Сервер:Порт" />
+                    <q-input class="full-width" v-model="url" label="URL" ref="url" :rules="[val => val && val.length > 0 || 'Заполните поле']" placeholder="cервер:порт" />
                 </q-item>
                 <q-item>
                     <q-input class="full-width" v-model="comment" label="Комментарий" type="textarea" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
@@ -46,6 +46,9 @@
                 <div v-if="isActiveRegistrateSpinner" class="flex justify-center">
                     <q-spinner-puff color="primary" size="3em"/>
                 </div>
+                <q-item v-show="messageErr">
+                    <p class="text-red">{{ messageErr }}</p>
+                </q-item>
                 <q-item>
                     <q-btn v-if="isActiveButton" color="primary" label="Авторизироваться" @click="terminalRegistration" />
                 </q-item>
@@ -72,7 +75,15 @@
                     <q-input class="full-width" v-model="login" label="Логин" ref="login" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
                 </q-item>
                 <q-item>
-                    <q-input class="full-width" v-model="password" label="Пароль" ref="password" type="password" :rules="[val => val && val.length > 0 || 'Заполните поле']" />
+                    <q-input class="full-width" v-model="password" label="Пароль" ref="password" :type="isPwd ? 'password' : 'text'" :rules="[val => val && val.length > 0 || 'Заполните поле']">
+                        <template v-slot:append>
+                            <q-icon
+                                :name="isPwd ? 'visibility_off' : 'visibility'"
+                                class="cursor-pointer"
+                                @click="isPwd = !isPwd"
+                            />
+                        </template>
+                    </q-input>
                 </q-item>
                 <q-item>
                     <q-item-section>
@@ -156,6 +167,7 @@
                 port: '',
                 login: '',
                 password: '',
+                isPwd: true,
                 comment: localStorage.comment,
                 status: localStorage.status,
                 color: localStorage.color,
@@ -163,6 +175,7 @@
                 isCashier: false,
                 messageSuccessful: null,
                 messageError: null,
+                messageErr: null,
                 messageRegistrateSuccessful: null,
                 messageRegistrateError: null,
                 model: null,
@@ -176,6 +189,17 @@
                 objects: [],
                 deviceId: device.uuid,
                 test: ''
+            }
+        },
+        watch: {
+            url : function(v) {
+                this.url = v.toLowerCase().trim();
+            },
+            server : function(v) {
+                this.server = v.toLowerCase().trim();
+            },
+            login : function(v) {
+                this.login = v.toLowerCase().trim();
             }
         },
         methods: {
@@ -206,14 +230,18 @@
                         localStorage.url = this.url;
                         localStorage.comment = this.comment;
                         this.getStatus(idrref);
+                        this.messageErr = false;
                     })
                     .catch(err => {
                         console.log('Произошла ошибка при регистрации терминала: ', err);
+                        this.messageErr = 'Произошла ошибка при регистрации терминала! Проверьте поля.';
                         this.isActiveRegistrateSpinner = false;
                         this.isActiveButton = true;
                     });
 
-                this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
+                if (localStorage.idrref) {
+                    this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
+                }
             },
 
             testConnection: async function () {
@@ -394,6 +422,14 @@
             },
 
             getStatus: function (idrref) {
+                let vm = this;
+
+                if (!idrref || !idrref.length || idrref == undefined) {
+                    console.log('Передано пустое значение idrref');
+                    clearInterval(vm.test);
+                    return
+                }
+
                 let query = `select * from _reference13 where _idrref = '${idrref}'`;
                 let envelope = buildFillRequest(query);
 
@@ -402,8 +438,6 @@
                     url: 'http://' + this.url,
                     data: envelope
                 };
-
-                let vm = this;
 
                 this.$axios(options)
                     .then(response => {
@@ -437,6 +471,7 @@
                     })
                     .catch(err => {
                         console.log('Произошла ошибка при запросе статуса терминала: ', err);
+                        clearInterval(vm.test);
                     })
             }
         },
