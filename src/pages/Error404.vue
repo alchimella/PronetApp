@@ -10,6 +10,7 @@
             to="/"
             label="Go back"
         />
+        
     </div>
 </template>
 

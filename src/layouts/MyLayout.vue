@@ -1,6 +1,6 @@
 <template>
     <q-layout view="lHh Lpr lFf">
-        <q-header bordered>
+        <!-- <q-header bordered>
             <q-toolbar class="flex row justify-between">
                 <q-btn
                     v-if="isCashier"
@@ -23,7 +23,7 @@
                     class="flex col-2"
                 />
             </q-toolbar>
-        </q-header>
+        </q-header> -->
 
         <q-drawer
             side="right"
@@ -188,6 +188,7 @@
                 isActiveSelect: false,
                 objects: [],
                 deviceId: device.uuid,
+                // deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfc6d4',
                 test: ''
             }
         },
@@ -200,6 +201,10 @@
             },
             login : function(v) {
                 this.login = v.toLowerCase().trim();
+            },
+            test: function(v) {
+                console.warn(this.isCashier)
+                if (this.isCashier) clearInterval(v)
             }
         },
         methods: {
@@ -221,27 +226,33 @@
                     data: envelope
                 };
 
+                let _this = this;
+
                 this.$axios(options)
                     .then(response => {
                         console.log('Запрос на регистрацию терминала прошел успешно. Ожидается подтверждение!', response);
 
-                        let idrref = response.data.envelope.body.response.data[0]._idrref;
+                        let idrref = response.data.envelope.body.response.data[0]["_idrref"];
                         localStorage.idrref = idrref;
                         localStorage.url = this.url;
                         localStorage.comment = this.comment;
-                        this.getStatus(idrref);
+                        // this.getStatus(idrref);
+                        this.test = setInterval(async () => await this.getStatus(idrref), 10000);
                         this.messageErr = false;
+                        this.isActiveRegistrateSpinner = false;
+                        this.status = 'В ожидании';
+                        this.color = 'orange';
+                        localStorage.status = this.status;
+                        localStorage.color = this.color;
+                        this.isActiveButton = true;
                     })
                     .catch(err => {
-                        console.log('Произошла ошибка при регистрации терминала: ', err);
+                        console.warn(err)
+                        console.error('Произошла ошибка при регистрации терминала: ', err);
                         this.messageErr = 'Произошла ошибка при регистрации терминала! Проверьте поля.';
                         this.isActiveRegistrateSpinner = false;
                         this.isActiveButton = true;
                     });
-
-                if (localStorage.idrref) {
-                    this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
-                }
             },
 
             testConnection: async function () {
@@ -273,7 +284,7 @@
                         this.messageSuccessful = 'Успешное соединение!';
                     })
                     .catch(err => {
-                        console.log('Произошла ошибка при соединении с сервером: ', err);
+                        console.error('Произошла ошибка при соединении с сервером: ', err);
 
                         this.isActiveSpinner = false;
                         this.isActiveButton = true;
@@ -327,7 +338,7 @@
                             localStorage.setItem('login', this.login);
                             localStorage.setItem('password', this.password);
                         } else {
-                            console.log('Произошла ошибка при авторизации. Неправильный логин или пароль');
+                            console.error('Произошла ошибка при авторизации. Неправильный логин или пароль');
 
                             this.isActiveSelect = false;
                             this.isActiveRegistrateButton = false;
@@ -338,7 +349,7 @@
                         }
                     })
                     .catch(err => {
-                        console.log('Произошла ошибка при соединении с сервером: ', err);
+                        console.error('Произошла ошибка при соединении с сервером: ', err);
 
                         this.isActiveSpinner = false;
                         this.isActiveButton = true;
@@ -349,7 +360,7 @@
                 console.log('Запушен процесс регистрации');
 
                 if (!this.deviceId || !this.model) {
-                    console.log('Приходят пустые значения deviceId - ' + this.deviceId + ' или model - ' + this.model);
+                    console.error('Приходят пустые значения deviceId - ' + this.deviceId + ' или model - ' + this.model);
 
                     this.isActiveRegistrateButton = true;
                     this.isActiveRegistrateSpinner = false;
@@ -383,7 +394,7 @@
                             localStorage.setItem('model', this.model);
                         })
                         .catch(err => {
-                            console.log('Произошла ошибка при регистрации устройства на объект: ', err);
+                            console.error('Произошла ошибка при регистрации устройства на объект: ', err);
 
                             this.isActiveRegistrateSpinner = false;
                             this.isActiveRegistrateButton = true;
@@ -414,7 +425,7 @@
 
                     localStorage.setItem('objects', JSON.stringify(this.objects));
                 } catch (err) {
-                    console.log('Произошла ошибка при загрузке объектов: ', err);
+                    console.error('Произошла ошибка при загрузке объектов: ', err);
 
                     this.isError = true;
                     this.message = 'Произошла ошибка при загрузке объектов!'
@@ -425,8 +436,8 @@
                 let vm = this;
 
                 if (!idrref || !idrref.length || idrref == undefined) {
-                    console.log('Передано пустое значение idrref');
-                    clearInterval(vm.test);
+                    console.error('Передано пустое значение idrref');
+                    clearInterval(this.test);
                     return
                 }
 
@@ -441,7 +452,7 @@
 
                 this.$axios(options)
                     .then(response => {
-                        let res = response.data.envelope.body.response.data[0]._status;
+                        let res = response.data.envelope.body.response.data[0]["_status"];
 
                         if (res == 0) {
                             vm.status = 'В ожидании';
@@ -452,25 +463,25 @@
                         if (res == 1) {
                             vm.status = 'Принято';
                             vm.color = 'green';
-                            clearInterval(vm.test);
                             localStorage.isUser = false;
                             localStorage.isCashier = true;
                             vm.isUser = false;
                             vm.isCashier = true;
+                            clearInterval(this.test);
                         }
                         if (res == 2) {
                             vm.status = 'Отклонено';
                             vm.color = 'red';
-                            clearInterval(vm.test);
                             localStorage.status = vm.status;
                             localStorage.color = vm.color;
+                            clearInterval(this.test);
                         }
 
                         this.isActiveRegistrateSpinner = false;
                         this.isActiveButton = true;
                     })
                     .catch(err => {
-                        console.log('Произошла ошибка при запросе статуса терминала: ', err);
+                        console.error('Произошла ошибка при запросе статуса терминала: ', err);
                         clearInterval(vm.test);
                     })
             }
@@ -484,7 +495,7 @@
             if (this.url.length && this.isUser && !localStorage.isCashier) {
                 this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
             } else {
-                clearInterval();
+                clearInterval(this.test);
             }
         },
         mounted() {
@@ -494,6 +505,17 @@
             let password = localStorage.getItem('password');
             let objects = JSON.parse(localStorage.getItem('objects'));
             let model = localStorage.getItem('model');
+
+            if (localStorage.isCashier) {
+                this.isUser = false;
+                this.isCashier = true;
+            }
+
+            if (this.url.length && this.isUser && !localStorage.isCashier) {
+                this.test = setInterval(async () => await this.getStatus(localStorage.idrref), 10000);
+            } else {
+                clearInterval();
+            }
 
             if (!objects || !model) {
                 this.model = model;
