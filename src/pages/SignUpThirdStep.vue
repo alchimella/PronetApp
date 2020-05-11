@@ -8,11 +8,21 @@
             <h2 class="flex justify-center full-width">Ваш лицевой счет</h2>
             <h1>100258752</h1>
             <h2 class="flex justify-center full-width">Введите пароль</h2>
-            <q-input class="q-mt-md full-width input" dark borderless placeholder="+966 (000) 000  000 " />
+            <q-input class="q-mt-md full-width input" v-model="password" dark borderless :type="isPwd ? 'password' : 'text'" placeholder="Введите пароль">
+                <template v-slot:append>
+                <q-icon
+                    class="q-pr-lg"
+                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    @click="isPwd = !isPwd"
+                />
+                </template>
+            </q-input>
         </div>
         <div class="flex row justify-center content-end items-end full-width">
-            <q-btn class="q-mb-lg call-button" size="lg" color="test" round no-caps>
-                <img src="../assets/call.png" alt="" style="width: 28px">
+            <q-btn class="q-mb-lg call-button" size="lg" color="success-green2" round>
+                <a class="flex items-center" href="tel:+996550426964">
+                    <img class="button-icon" src="../assets/call.png">
+                </a>
             </q-btn>
             <h3 class="flex justify-center full-width">Служба поддержки</h3>
         </div>
@@ -24,7 +34,14 @@
 
 <script>
     export default {
-        name: "SignUpThirdStep"
+        name: "SignUpThirdStep",
+
+        data() {
+            return {
+                password: '',
+                isPwd: true
+            }
+        }
     }
 </script>
 

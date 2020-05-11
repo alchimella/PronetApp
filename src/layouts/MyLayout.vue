@@ -147,18 +147,21 @@
             </q-list>
         </q-drawer>
 
-        <q-page-container>
-            <router-view v-if="isUser" :isUser="isUser" class="background"/>
-            <router-view v-else :isUser="isUser" />
+        <q-page-container class="background">
+            <!-- <router-view v-if="isUser" :isUser="isUser" class="background"/> -->
+            <router-view />
+            <Footer />
         </q-page-container>
     </q-layout>
 </template>
 
 <script>
+    import Footer from '../components/Footer'  
     import { buildRegTRequest, buildLogonRequest, buildFillRequest, buildPackRequest } from '../boot/options';
 
     export default {
         name: 'MyLayout',
+        components: { Footer },
 
         data () {
             return {
@@ -554,9 +557,9 @@
 </script>
 
 <style scoped>
-    .background {
+    /* .background {
         background: url("../statics/background.png");
         background-size: cover;
-    }
+    } */
 
 </style>

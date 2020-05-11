@@ -1,6 +1,6 @@
 <template>
   <q-layout>
-    <q-page-container>
+    <q-page-container class="background-signup">
         <transition
             appear
             enter-active-class="animated slideInLeft"
