@@ -1,8 +1,9 @@
 <template>
-    <q-fab class="float-action-button" hide-icon color="next-blue1" size="lg" direction="left">
+    <q-fab class="float-action-button" hide-icon icon="" color="next-blue1" size="lg" direction="left">
         <q-fab-action color="next-blue1" @click="$router.replace('enter-code')">
             <img style="width: 32px; height: 22px" src="../assets/enter-code.png" alt="">
         </q-fab-action>
+        
         <q-fab-action color="next-blue1" @click="scan">
             <img style="width: 32px; height: 22px" src="../assets/scan.png" alt="">
         </q-fab-action>
@@ -16,12 +17,37 @@ export default {
     methods: {
         scan: function () {
             let _this = this;
+            alert('text')
 
             cordova.plugins.barcodeScanner.scan(
                 function (result) {
-                    let url = _this.checkAuth();
+                    alert(result.text)
+                    if (result.text) {
+                        let options = {
+                            method: 'post',
+                            url: 'http://web.pronet.kg:1082',
+                            data: envelope
+                        };
 
-                    _this.post(url, result.text);
+                        this.$axios(options)
+                            .then(response => {
+                                let data = response.data.envelope.body.response.data;
+
+                                if (data.length) {
+                                    console.log('Найден талон с номером - ' + result.text, data);
+
+                                    alert('Найден талон с номером - ' + result.text)
+
+                                } else {
+                                    console.log('Талонов с кодом - ' + result.text + ' не найдено!');
+                                    alert('Талонов с кодом - ' + result.text + ' не найдено!')
+                                }
+                            })
+                            .catch(err => {
+                                console.log('Произошла ошибка при поиске талона: ', err);
+                                alert('Произошла ошибка при поиске талона')
+                            })
+                    }
                 },
                 function (error) {
                     // alert('Scanning failed: ' + error)

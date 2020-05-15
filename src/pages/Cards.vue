@@ -1,8 +1,9 @@
 <template>
     <q-page class="flex flex-center q-pa-lg">
         <div class="flex row justify-center">
-            <img class="col-10" src="../assets/card-background.png" alt="">
+            <img class="col-10" src="../assets/card-background.png" alt="" style="height: 138px">
         </div>
+        
         <div class="flex row justify-end q-pa-lg full-width" style="position: absolute; bottom: 0">
             <FloatActionButton />
         </div>

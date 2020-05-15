@@ -16,6 +16,7 @@ const routes = [
             { path: 'coupons', component: () => import('pages/Coupons.vue') },
             { path: 'cards', component: () => import('pages/Cards.vue') },
             { path: 'enter-code', component: () => import('pages/EnterCode.vue') },
+            { path: 'settings', component: () => import('pages/Settings.vue') },
             { path: 'ticket', component: () => import('pages/Ticket.vue') }
         ]
     }
