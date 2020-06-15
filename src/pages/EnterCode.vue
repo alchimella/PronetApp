@@ -2,10 +2,10 @@
     <q-page class="flex flex-center content-center q-pa-lg">
         <h2 class="flex justify-center full-width">Введите код талона</h2>
         <q-input class="full-width input" v-model="code" dark borderless />
-        
+
         <div class="flex row justify-center items-end full-width">
             <h3 v-show="errorMessage.length > 0" class="q-pt-lg full-width">{{ errorMessage }}</h3>
-            <q-btn class="q-mt-lg q-mb-lg full-width submit-button" label="Далее" :loading="submitting" :disable="!isButtonActive" @click="enter" no-caps>
+            <q-btn class="q-mt-lg q-mb-lg full-width submit-button" label="Далее" :loading="submitting" :disable="!isButtonActive" @click="getCoupon" no-caps>
                 <template v-slot:loading>
                     <q-spinner />
                 </template>
@@ -20,7 +20,6 @@
 
 <script>
 import FloatActionButton from '../components/FloatActionButton'
-import { getCardRequest } from '../boot/options';
 
 export default {
     name: 'EnterCode',
@@ -31,12 +30,13 @@ export default {
             code: '',
             errorMessage: '',
             submitting: false,
-            isButtonActive: true
+            isButtonActive: true,
+            signature: 'a80ef6f574652d870113226ba0cbe72c'
         }
     },
 
     methods: {
-        enter: async function () {
+        getCoupon: async function () {
             console.log('Запушен процесс отправки запроса по талону в ручную');
 
             if (this.code.length == 0) {
@@ -48,13 +48,10 @@ export default {
             this.submitting = true;
             this.isButtonActive = false;
 
-            let envelope = getCardRequest(this.code);
-
             if (this.code) {
                 let options = {
                     method: 'post',
-                    url: 'http://web.pronet.kg:1082',
-                    data: envelope
+                    url: `http://pn.pronet.kg:1072/api/81a05d419edf445b9a1d4964eade2c01?op=4&idrref=${this.code}&signature=${this.signature}`
                 };
 
                 this.$axios(options)
@@ -64,11 +61,13 @@ export default {
                         if (data.length) {
                             console.log('Найден талон с номером - ' + this.code, data);
 
-                            this.errorMessage = ''    
+                            this.errorMessage = ''
                             this.submitting = false;
                             this.isButtonActive = true;
 
-                            alert('Найден талон с номером - ' + this.code)
+                            let result = data.filter(item => item._accumreg1_amount > 0)
+                            this.$store.dispatch('loadCoupons', result);
+                            this.$router.replace('coupons')
 
                         } else {
                             console.log('Талонов с кодом - ' + this.code + ' не найдено!');

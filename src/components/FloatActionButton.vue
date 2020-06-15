@@ -1,10 +1,10 @@
 <template>
-    <q-fab class="float-action-button" hide-icon icon="" color="next-blue1" size="lg" direction="left">
-        <q-fab-action color="next-blue1" @click="$router.replace('enter-code')">
+    <q-fab class="float-action-button" hide-icon color="next-blue1" size="lg" direction="left">
+        <q-fab-action icon="" color="next-blue1" @click="$router.replace('enter-code')">
             <img style="width: 32px; height: 22px" src="../assets/enter-code.png" alt="">
         </q-fab-action>
-        
-        <q-fab-action color="next-blue1" @click="scan">
+
+        <q-fab-action icon="" color="next-blue1" @click="scan">
             <img style="width: 32px; height: 22px" src="../assets/scan.png" alt="">
         </q-fab-action>
     </q-fab>
@@ -13,40 +13,35 @@
 <script>
 export default {
     name: 'FloatActionButton',
+    props: ['isScaned'],
+
+    data() {
+        return {
+            signature: this.$config.signature
+        }
+    },
 
     methods: {
         scan: function () {
             let _this = this;
-            alert('text')
 
             cordova.plugins.barcodeScanner.scan(
-                function (result) {
-                    alert(result.text)
-                    if (result.text) {
+                async function (result) {
+                    let code = result.text;
+
+                    _this.isScaned = true;
+                    _this.$emit('spinner', _this.isScaned)
+
+                    if (code) {
                         let options = {
                             method: 'post',
-                            url: 'http://web.pronet.kg:1082',
-                            data: envelope
+                            url: `http://pn.pronet.kg:1072/api/81a05d419edf445b9a1d4964eade2c01?op=4&idrref=${result.text}&signature=${_this.signature}`
                         };
 
-                        this.$axios(options)
-                            .then(response => {
-                                let data = response.data.envelope.body.response.data;
-
-                                if (data.length) {
-                                    console.log('Найден талон с номером - ' + result.text, data);
-
-                                    alert('Найден талон с номером - ' + result.text)
-
-                                } else {
-                                    console.log('Талонов с кодом - ' + result.text + ' не найдено!');
-                                    alert('Талонов с кодом - ' + result.text + ' не найдено!')
-                                }
-                            })
-                            .catch(err => {
-                                console.log('Произошла ошибка при поиске талона: ', err);
-                                alert('Произошла ошибка при поиске талона')
-                            })
+                        await _this.getCoupons(options, code)
+                        _this.isScaned = false;
+                        _this.$emit('spinner', _this.isScaned)
+                        _this.$router.replace('coupons');
                     }
                 },
                 function (error) {
@@ -66,6 +61,21 @@ export default {
                     disableSuccessBeep: false // iOS and Android
                 }
             )
+        },
+
+        getCoupons: async function (options, code) {
+            try {
+                let response = await this.$axios(options);
+                let data = response.data.envelope.body.response.data;
+
+                if (data.length) {
+                    console.log('Найден талон с номером - ' + code, data);
+                    let result = data.filter(item => item._accumreg1_amount > 0);
+                    this.$store.dispatch('loadCoupons', result);
+                } else console.log('Нет данных', data);
+            } catch (e) {
+                console.log('Произошла ошибка при поиске талона: ', err);
+            }
         }
     }
 }

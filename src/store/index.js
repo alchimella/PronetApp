@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { Platform } from 'quasar'
 
 // import example from './module-example'
 
@@ -18,6 +19,35 @@ export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
       // example
+    },
+
+    state: {
+      account: '',
+      coupons: []
+    },
+
+    getters: {
+      account: state => {
+        return state.account
+      },
+      coupons: state => {
+        return state.coupons
+      }
+    },
+
+    mutations: {
+      setAccount (state, payload) {
+        state.account = payload
+      },
+      setCoupons (state, payload) {
+        Vue.set(state, 'coupons', payload);
+      }
+    },
+
+    actions: {
+      loadCoupons: (context, items) => {
+        context.commit('setCoupons', items);
+      }
     },
 
     // enable strict mode (adds overhead!)

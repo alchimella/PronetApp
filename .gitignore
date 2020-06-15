@@ -8,8 +8,11 @@ node_modules
 
 # Cordova related directories and files
 /src-cordova/node_modules
-/src-cordova/platforms
-/src-cordova/plugins
+/src-cordova/plugins/cordova-plugin-add-swift-support
+/src-cordova/plugins/cordova-plugin-apkInstaller
+/src-cordova/plugins/cordova-plugin-file
+/src-cordova/plugins/cordova-plugin-file-transfer
+/src-cordova/plugins/cordova-plugin-whitelist
 /src-cordova/www
 
 # Capacitor related directories and files

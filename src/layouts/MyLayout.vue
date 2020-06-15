@@ -23,7 +23,7 @@
                     class="flex col-2"
                 />
             </q-toolbar>
-        </q-header> -->
+        </q-header>
 
         <q-drawer
             side="right"
@@ -145,7 +145,7 @@
                     </q-item-section>
                 </q-item>
             </q-list>
-        </q-drawer>
+        </q-drawer> -->
 
         <q-page-container class="background">
             <!-- <router-view v-if="isUser" :isUser="isUser" class="background"/> -->

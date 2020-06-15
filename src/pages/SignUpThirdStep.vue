@@ -5,7 +5,7 @@
         <div class="flex row justify-center content-center full-width">
             <img src="../assets/avatar.png" alt="" style="width: 87px; height: 110px">
             <h2 class="flex justify-center full-width">Ваш лицевой счет</h2>
-            <h1>100258752</h1>
+            <h1>{{ account }}</h1>
             <h2 class="flex justify-center full-width">Введите пароль</h2>
             <q-input class="full-width input" v-model="password" dark borderless :type="isPwd ? 'password' : 'text'" placeholder="Введите пароль">
                 <template v-slot:append>
@@ -26,7 +26,7 @@
             </q-btn>
             <h3 class="flex justify-center full-width">Служба поддержки</h3>
         </div>
-        
+
         <div class="flex row justify-center items-end full-width">
             <h3 v-show="errorMessage.length > 0" class="q-pa-lg full-width">{{ errorMessage }}</h3>
             <q-btn class="full-width submit-button" label="Авторизация" :loading="submitting" :disable="!isButtonActive" @click="singIn" no-caps />
@@ -46,10 +46,13 @@
             return {
                 password: '',
                 errorMessage: '',
+                idrref: localStorage.idrref,
+                account: localStorage.account,
                 submitting: false,
                 isButtonActive: true,
-                deviceId: device.uuid,
-                // deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
+                // deviceId: device.uuid,
+                deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
+                signature: 'a80ef6f574652d870113226ba0cbe72c',
                 isPwd: true
             }
         },
@@ -63,7 +66,7 @@
 
                 let options = {
                     method: 'post',
-                    url: 'http://web.pronet.kg:1082',
+                    url: 'http://pn.pronet.kg:1072',
                     data: envelope
                 };
 
@@ -92,6 +95,8 @@
                 this.submitting = true;
                 this.isButtonActive = false;
 
+                let message = '';
+
                 if (this.password.length == 0) {
                     console.warn('Поле с паролем не заполнено');
 
@@ -101,34 +106,35 @@
                     return
                 }
 
-                if (this.password != localStorage.password) {
-                    console.warn('Неверный пароль');
+                let options = {
+                    method: 'post',
+                    url: `http://pn.pronet.kg:1072/api/81a05d419edf445b9a1d4964eade2c01?op=3&idrref=${this.idrref}&passwd=${this.password}&signature=${this.signature}`,
+                };
 
-                    this.errorMessage = 'Неверный пароль. Введите еще раз';
-                    this.submitting = false;
-                    this.isButtonActive = true;
-                    return
-                }
+                this.$axios(options)
+                    .then(response => {
+                        console.log('Авторизация прошела успешно', response);
 
-                let status = await this.getStatus;
+                        let hasError = response.data.envelope.body.response.haserror;
+                        message = response.data.envelope.body.response.message;
 
-                if (localStorage.status == 0) {
-                    this.submitting = false;
-                    this.isButtonActive = true;
+                        if (hasError) throw new Error('Неверный пароль. Введите еще раз')
 
-                    return this.errorMessage = 'В ожидании';
-                }
-                if (localStorage.status == 2) {
-                    this.submitting = false;
-                    this.isButtonActive = true;
+                        let code = response.data.envelope.body.response.data._code;
+                        this.$store.commit('setAccount', code)
+                        this.errorMessage = '';
+                        this.submitting = false;
+                        this.isButtonActive = true;
 
-                    return this.errorMessage = 'Отклонено';
-                }
+                        this.$router.replace('/')
+                    })
+                    .catch(err => {
+                        console.error('Произошла ошибка при авторизации: ', err);
 
-                this.errorMessage = '';
-                this.submitting = false;
-                this.isButtonActive = true;
-                this.$router.replace('/')
+                        this.errorMessage = message;
+                        this.submitting = false;
+                        this.isButtonActive = true;
+                    })
             }
         }
     }
