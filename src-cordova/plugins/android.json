@@ -10,6 +10,12 @@
     "cordova-plugin-apkInstaller": {
       "PACKAGE_NAME": "com.pronet.app"
     },
+    "cordova-plugin-appversion": {
+      "PACKAGE_NAME": "com.pronet.app"
+    },
+    "cordova-plugin-device": {
+      "PACKAGE_NAME": "com.pronet.app"
+    },
     "cordova-plugin-file-transfer": {
       "PACKAGE_NAME": "com.pronet.app"
     },

@@ -113,9 +113,9 @@ if (hasBuildExtras2) {
 
 // Set property defaults after extension .gradle files.
 ext.cdvCompileSdkVersion = cdvCompileSdkVersion == null ? (
-    defaultCompileSdkVersion == null 
+    defaultCompileSdkVersion == null
         ? privateHelpers.getProjectTarget()
-        : defaultCompileSdkVersion 
+        : defaultCompileSdkVersion
 ) : Integer.parseInt('' + cdvCompileSdkVersion);
 
 if (ext.cdvBuildToolsVersion == null) {
@@ -184,8 +184,9 @@ task cdvPrintProps {
 
 android {
     defaultConfig {
-        versionCode cdvVersionCode ?: new BigInteger("" + privateHelpers.extractIntFromManifest("versionCode"))
+        versionCode = 2
         applicationId privateHelpers.extractStringFromManifest("package")
+        versionName = '2'
 
         if (cdvMinSdkVersion != null) {
             minSdkVersion cdvMinSdkVersion

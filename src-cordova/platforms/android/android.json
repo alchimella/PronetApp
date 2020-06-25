@@ -29,6 +29,10 @@
               "count": 1
             },
             {
+              "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
+              "count": 1
+            },
+            {
               "xml": "<feature name=\"File\"><param name=\"android-package\" value=\"org.apache.cordova.file.FileUtils\" /><param name=\"onload\" value=\"true\" /></feature>",
               "count": 1
             },
@@ -92,6 +96,16 @@
             }
           ]
         }
+      },
+      "config.xml": {
+        "parents": {
+          "/*": [
+            {
+              "xml": "<feature name=\"RareloopAppVersion\"><param name=\"android-package\" value=\"com.rareloop.cordova.appversion.RareloopAppVersion\" /></feature>",
+              "count": 1
+            }
+          ]
+        }
       }
     }
   },
@@ -100,6 +114,12 @@
       "PACKAGE_NAME": "com.pronet.app"
     },
     "cordova-plugin-apkInstaller": {
+      "PACKAGE_NAME": "com.pronet.app"
+    },
+    "cordova-plugin-appversion": {
+      "PACKAGE_NAME": "com.pronet.app"
+    },
+    "cordova-plugin-device": {
       "PACKAGE_NAME": "com.pronet.app"
     },
     "cordova-plugin-file": {
@@ -123,6 +143,22 @@
       "pluginId": "cordova-plugin-apkInstaller",
       "clobbers": [
         "apkInstaller"
+      ]
+    },
+    {
+      "id": "cordova-plugin-appversion.RareloopAppVersion",
+      "file": "plugins/cordova-plugin-appversion/www/app-version.js",
+      "pluginId": "cordova-plugin-appversion",
+      "clobbers": [
+        "AppVersion"
+      ]
+    },
+    {
+      "id": "cordova-plugin-device.device",
+      "file": "plugins/cordova-plugin-device/www/device.js",
+      "pluginId": "cordova-plugin-device",
+      "clobbers": [
+        "device"
       ]
     },
     {
@@ -326,6 +362,8 @@
   "plugin_metadata": {
     "cordova-plugin-add-swift-support": "2.0.2",
     "cordova-plugin-apkInstaller": "1.1.1",
+    "cordova-plugin-appversion": "1.0.0",
+    "cordova-plugin-device": "2.0.3",
     "cordova-plugin-file": "6.0.2",
     "cordova-plugin-file-transfer": "1.7.1",
     "cordova-plugin-qr-barcode-scanner": "8.0.3",

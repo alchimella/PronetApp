@@ -26,12 +26,18 @@
     <feature name="FileTransfer">
         <param name="ios-package" value="CDVFileTransfer" />
     </feature>
+    <feature name="BarcodeScanner">
+        <param name="ios-package" value="CDVBarcodeScanner" />
+    </feature>
+    <feature name="RareloopAppVersion">
+        <param name="ios-package" value="RareloopAppVersion" />
+    </feature>
     <name>Quasar App</name>
     <description>A Quasar Framework app</description>
     <author email="dev@cordova.apache.org" href="http://cordova.io">
         Apache Cordova Team
     </author>
-    <content src="index.html" />
+    <content src="http://192.168.0.104:8080" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -43,6 +49,7 @@
         <string>To scan barcodes</string>
     </edit-config>
     <allow-navigation href="about:*" />
+    <allow-navigation href="http://192.168.0.104:8080" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <icon height="1024" src="res/icon/ios/icon-1024.png" width="1024" />
@@ -91,7 +98,7 @@
     <preference name="SplashScreen" value="screen" />
     <preference name="ShowSplashScreen" value="true" />
     <preference name="SplashScreenDelay" value="30000" />
-    <feature name="BarcodeScanner">
-        <param name="ios-package" value="CDVBarcodeScanner" />
+    <feature name="Device">
+        <param name="ios-package" value="CDVDevice" />
     </feature>
 </widget>

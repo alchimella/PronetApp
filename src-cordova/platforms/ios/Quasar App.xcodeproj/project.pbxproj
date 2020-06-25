@@ -23,6 +23,8 @@
 		5D417BACB7D1495095FA92F6 /* CDVBarcodeScanner.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E33FF100C240466C84A12443 /* CDVBarcodeScanner.bundle */; };
 		75C240B63E014600ABE41C7E /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 519FC7DF6E55426293A723EE /* AVFoundation.framework */; };
 		2C678250995442A5B5944A2C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F89E83AB8AE7479093152227 /* AudioToolbox.framework */; };
+		96C39DB798814AACB3669C2F /* RareloopAppVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 3CF5E2CAA32A42219A0A9B4E /* RareloopAppVersion.m */; };
+		955101CB766F4823B0187E31 /* CDVDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = E0E303F2EE984C8BADCF7316 /* CDVDevice.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +85,10 @@
 		E33FF100C240466C84A12443 /* CDVBarcodeScanner.bundle */ = {isa = PBXFileReference; name = "CDVBarcodeScanner.bundle"; path = "CDVBarcodeScanner.bundle"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.plug-in; explicitFileType = undefined; includeInIndex = 0; };
 		519FC7DF6E55426293A723EE /* AVFoundation.framework */ = {isa = PBXFileReference; name = "AVFoundation.framework"; path = "System/Library/Frameworks/AVFoundation.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
 		F89E83AB8AE7479093152227 /* AudioToolbox.framework */ = {isa = PBXFileReference; name = "AudioToolbox.framework"; path = "System/Library/Frameworks/AudioToolbox.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
+		3CF5E2CAA32A42219A0A9B4E /* RareloopAppVersion.m */ = {isa = PBXFileReference; name = "RareloopAppVersion.m"; path = "cordova-plugin-appversion/RareloopAppVersion.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		0A25BC8B74C34FA89E78AB83 /* RareloopAppVersion.h */ = {isa = PBXFileReference; name = "RareloopAppVersion.h"; path = "cordova-plugin-appversion/RareloopAppVersion.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		E0E303F2EE984C8BADCF7316 /* CDVDevice.m */ = {isa = PBXFileReference; name = "CDVDevice.m"; path = "cordova-plugin-device/CDVDevice.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		C658DA4D8FB6465C9DFD5AA4 /* CDVDevice.h */ = {isa = PBXFileReference; name = "CDVDevice.h"; path = "cordova-plugin-device/CDVDevice.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +208,10 @@
 				EBC1AA6E282E4F7E8275E050 /* CDVFileTransfer.m */,
 				A283733BDC784429A0496EE7 /* CDVFileTransfer.h */,
 				30CE793D0DA246B7B840C467 /* CDVBarcodeScanner.mm */,
+				3CF5E2CAA32A42219A0A9B4E /* RareloopAppVersion.m */,
+				0A25BC8B74C34FA89E78AB83 /* RareloopAppVersion.h */,
+				E0E303F2EE984C8BADCF7316 /* CDVDevice.m */,
+				C658DA4D8FB6465C9DFD5AA4 /* CDVDevice.h */,
 			);
 			name = Plugins;
 			path = "Quasar App/Plugins";
@@ -333,6 +343,8 @@
 				5473232190954289B65D5DA0 /* CDVAssetLibraryFilesystem.m in Sources */,
 				81F28BB878A9407A953D12B5 /* CDVFileTransfer.m in Sources */,
 				95663B8CE8A54C70A657031F /* CDVBarcodeScanner.mm in Resources */,
+				96C39DB798814AACB3669C2F /* RareloopAppVersion.m in Sources */,
+				955101CB766F4823B0187E31 /* CDVDevice.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

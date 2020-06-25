@@ -17,6 +17,8 @@
     "cordova-ios": "^5.1.1",
     "cordova-plugin-add-swift-support": "^2.0.2",
     "cordova-plugin-apkinstaller": "^1.1.1",
+    "cordova-plugin-appversion": "^1.0.0",
+    "cordova-plugin-device": "^2.0.3",
     "cordova-plugin-file": "^6.0.2",
     "cordova-plugin-file-transfer": "^1.7.1",
     "cordova-plugin-qr-barcode-scanner": "^8.0.3"
@@ -31,7 +33,9 @@
       "cordova-plugin-qr-barcode-scanner": {
         "ANDROID_SUPPORT_V4_VERSION": "27.+"
       },
-      "cordova-plugin-apkInstaller": {}
+      "cordova-plugin-apkInstaller": {},
+      "cordova-plugin-appversion": {},
+      "cordova-plugin-device": {}
     },
     "platforms": [
       "ios",

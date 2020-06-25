@@ -48,8 +48,8 @@
                 isButtonActive: true,
                 errorMessage: '',
                 idrref: this.$config.userIdrref,
-                // deviceId: device.uuid,
-                deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
+                deviceId: device.uuid,
+                // deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
                 signature: 'a80ef6f574652d870113226ba0cbe72c'
             }
         },

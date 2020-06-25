@@ -3,6 +3,9 @@
     <feature name="apkInstaller">
         <param name="android-package" value="plugin.apkInstaller.ApkInstaller" />
     </feature>
+    <feature name="Device">
+        <param name="android-package" value="org.apache.cordova.device.Device" />
+    </feature>
     <feature name="File">
         <param name="android-package" value="org.apache.cordova.file.FileUtils" />
         <param name="onload" value="true" />
@@ -17,6 +20,9 @@
     <feature name="Whitelist">
         <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
         <param name="onload" value="true" />
+    </feature>
+    <feature name="RareloopAppVersion">
+        <param name="android-package" value="com.rareloop.cordova.appversion.RareloopAppVersion" />
     </feature>
     <name>Quasar App</name>
     <description>A Quasar Framework app</description>

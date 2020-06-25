@@ -46,5 +46,21 @@
     },
     "is_top_level": true,
     "variables": {}
+  },
+  "cordova-plugin-appversion": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-appversion"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-device": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-device"
+    },
+    "is_top_level": true,
+    "variables": {}
   }
 }

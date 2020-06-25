@@ -13,6 +13,9 @@ node_modules
 /src-cordova/plugins/cordova-plugin-file
 /src-cordova/plugins/cordova-plugin-file-transfer
 /src-cordova/plugins/cordova-plugin-whitelist
+/src-cordova/plugins/cordova-plugin-device
+/src-cordova/plugins/cordova-plugin-appversion
+/src-cordova/platforms
 /src-cordova/www
 
 # Capacitor related directories and files
