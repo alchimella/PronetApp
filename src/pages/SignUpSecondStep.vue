@@ -1,28 +1,25 @@
 <template>
     <q-page class="flex q-pa-lg">
-        <Header />
         <div class="flex row justify-center content-center full-width">
-            <h2 class="flex justify-center full-width q-mt-xl">Введите код</h2>
+            <img class="l-logo" src="../assets/logo.png" />
+        </div>
+        <div class="flex row justify-center content-start full-width">
+            <h1 class="flex justify-center full-width">Мы отправили SMS код на номер</h1>
+            <h2>+996 (000) 000 000</h2>
+            <h3>Введите полученный код, чтобы подтвердить Ваш номер</h3>
 
-            <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t1 }}</label>
-            <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t2 }}</label>
-            <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t3 }}</label>
-            <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t4 }}</label>
-            <q-input class="q-mt-md full-width pin-input" pattern="\d*" maxlength="4" autofocus type="tel" v-model="pin" dark borderless />
-            <!-- <q-input class="full-width input" v-model="password" dark borderless type="password" placeholder="Введите пароль" />
-            <q-input class="q-mt-md full-width input" v-model="passwordRepeat" dark borderless type="password" placeholder="Повторите пароль" /> -->
+            <div class="flex row justify-center full-width l-pin-code">
+                <label class="flex justify-center content-center items-center otp-label">{{ t1 }}</label>
+                <label class="flex justify-center content-center items-center q-ml-sm otp-label">{{ t2 }}</label>
+                <label class="flex justify-center content-center items-center q-ml-sm otp-label">{{ t3 }}</label>
+                <label class="flex justify-center content-center items-center q-ml-sm otp-label">{{ t4 }}</label>
+                <q-input class="full-width otp-input" pattern="\d*" maxlength="4" autofocus type="tel" v-model="pin" dark borderless />
+            </div>
         </div>
 
-        <!-- <div class="flex row justify-center content-end items-end full-width">
-            <q-btn class="q-mb-lg" size="lg" round color="warning-orange1" no-caps :loading="check" @click="getStatus">
-                <img class="button-icon" src="../assets/reload.png">
-            </q-btn>
-            <h3 v-show="errorMessage.length > 0" class="q-pl-lg q-pr-lg full-width">{{ errorMessage }}</h3>
-        </div> -->
-
         <div class="flex row justify-center items-end full-width">
-            <h3 v-show="errorMessage.length > 0" class="q-pa-lg full-width">{{ errorMessage }}</h3>
-            <q-btn class="full-width submit-button" label="Завершить" :loading="submitting" :disable="!isButtonActive" @click="save" no-caps>
+            <h3 v-if="errorMessage.length > 0" class="full-width">{{ errorMessage }}</h3>
+            <q-btn class="full-width submit-button text-white" label="Подтвердить" :loading="submitting" :disable="!isButtonActive" @click="save">
                 <template v-slot:loading>
                     <q-spinner />
                 </template>
@@ -32,12 +29,10 @@
 </template>
 
 <script>
-    import Header from '../components/Header'
-    import { buildFillRequest, buildLogonRequest } from '../boot/options';
+    import { buildFillRequest } from '../boot/options';
 
     export default {
         name: "SignUpSecondStep",
-        components: { Header },
 
         data() {
             return {
@@ -48,8 +43,8 @@
                 isButtonActive: true,
                 errorMessage: '',
                 idrref: this.$config.userIdrref,
-                deviceId: device.uuid,
-                // deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
+                // deviceId: device.uuid,
+                deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
                 signature: 'a80ef6f574652d870113226ba0cbe72c'
             }
         },
@@ -57,28 +52,28 @@
         computed: {
             t1: function () {
                 if (this.pin.length >= 1) {
-                    return '•'
+                    return this.pin.charAt(0)
                 } else {
                     return ''
                 }
             },
             t2: function () {
                 if (this.pin.length >= 2) {
-                    return '•'
+                    return this.pin.charAt(1)
                 } else {
                     return ''
                 }
             },
             t3: function () {
                 if (this.pin.length >= 3) {
-                    return '•'
+                    return this.pin.charAt(2)
                 } else {
                     return ''
                 }
             },
             t4: function () {
                 if (this.pin.length == 4) {
-                    return '•'
+                    return this.pin.charAt(3)
                 } else {
                     return ''
                 }

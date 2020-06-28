@@ -1,10 +1,6 @@
 <template>
     <q-page class="flex q-pa-lg">
-        <div v-if="!coupons.length" class="flex row justify-center content-center items-center">
-            <img class="col-10" src="../assets/coupon-background.png" alt="" style="height: 138px">
-        </div>
-
-        <div v-else class="flex row justify-between content-start items-start full-width">
+        <div v-if="coupons.length" class="flex row justify-between content-start items-start full-width">
             <q-card v-for="item in coupons" :key="item.reference14_idrref" @click="getCouponDetail(item)" class="col-xs-5 col-sm-5 col-md-5 col-md-5 q-ma-sm q-pa-sm bg-primary-dark2" dark style="height: 200px">
                 <q-card-section class="text-overline">ЛC: {{ account }}</q-card-section>
                 <q-card-section class="flex justify-center text-h6">{{ item._reference14_name }}</q-card-section>
@@ -52,21 +48,15 @@
                 </q-card-actions>
             </q-card>
         </q-dialog>
-
-        <div class="flex row justify-end q-pa-lg full-width" style="position: absolute; bottom: 0; left: 0">
-            <FloatActionButton :isScaned="isScaned" @spinner="isScaned = $event" />
-        </div>
     </q-page>
 </template>
 
 <script>
 import moment from 'moment'
 import { mapGetters } from 'vuex'
-import FloatActionButton from '../components/FloatActionButton'
 
 export default {
     name: 'Coupons',
-    components: { FloatActionButton },
 
     data() {
         return {

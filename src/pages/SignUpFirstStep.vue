@@ -1,15 +1,16 @@
 <template>
     <q-page class="flex q-pa-lg">
-        <Header />
-
         <div class="flex row justify-center content-center full-width">
-            <h2 class="flex justify-center full-width">Введите номер</h2>
-            <q-input class="full-width input" v-model="phone" type="tel" pattern="\d*" dark borderless unmasked-value mask="+### (###) ### ###" placeholder="+996 (000) 000  000 " />
-            <q-input class="q-mt-md full-width input" v-model="password" dark borderless :type="isPwd ? 'password' : 'text'" placeholder="Введите пароль">
+            <img class="l-logo" src="../assets/logo.png" />
+        </div>
+        <div class="flex row justify-center content-center full-width">
+            <h1 class="flex justify-center full-width">Вход</h1>
+            <q-input class="full-width input" v-model="phone" type="tel" pattern="\d*" borderless unmasked-value placeholder="+996 (000) 000  000 " />
+            <q-input class="q-mt-md full-width input" v-model="password" borderless :type="isPwd ? 'password' : 'text'" placeholder="Введите пароль">
                 <template v-slot:append>
                 <q-icon
                     class="q-pr-lg"
-                    :name="isPwd ? 'visibility_off' : 'visibility'"
+                    :name="!isPwd ? 'visibility_off' : 'visibility'"
                     @click="isPwd = !isPwd"
                 />
                 </template>
@@ -18,7 +19,7 @@
 
         <div class="flex row justify-center content-end items-end full-width">
             <h3 v-show="errorMessage.length > 0" class="q-pl-lg q-pr-lg q-pb-lg full-width">{{ errorMessage }}</h3>
-            <q-btn class="full-width submit-button" label="Далее" :loading="submitting" :disable="!isButtonActive" @click="registerTerminal" no-caps>
+            <q-btn class="full-width submit-button text-white" label="Далее" :loading="submitting" :disable="!isButtonActive" @click="registerTerminal">
                 <template v-slot:loading>
                     <q-spinner />
                 </template>
@@ -28,11 +29,8 @@
 </template>
 
 <script>
-    import Header from '../components/Header'
-
     export default {
         name: "SignUpFirstStep",
-        components: { Header },
 
         data() {
             return {
@@ -41,8 +39,8 @@
                 errorMessage: '',
                 submitting: false,
                 isButtonActive: true,
-                deviceId: device.uuid,
-                // deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c2',
+                // deviceId: device.uuid,
+                deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c2',
                 signature: 'a80ef6f574652d870113226ba0cbe72c',
                 isPwd: true
             }

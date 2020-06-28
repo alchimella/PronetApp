@@ -1,12 +1,11 @@
 <template>
     <q-page class="flex justify-center content-center items-center">
-        <div class="justify-center full-width">CURRENT VERSION - {{verCounter}}</div>
-        <q-btn v-if="!isDownloadButtonActive" class="bg-next-blue1" color="bg-next-blue1" label="Проверить обновление" :loading="submitting" :disable="!isButtonActive" @click="checkUpdate">
+        <q-btn v-if="!isDownloadButtonActive" class="submit-button text-white" label="Проверить обновление" :loading="submitting" :disable="!isButtonActive" @click="checkUpdate">
             <template v-slot:loading>
                 <q-spinner />
             </template>
         </q-btn>
-        <q-btn v-else class="bg-next-blue1" color="bg-next-blue1" label="Скачать" :loading="submitting" :disable="!isButtonActive" @click="getUpdate">
+        <q-btn v-else class="submit-button text-white" label="Скачать" :loading="submitting" :disable="!isButtonActive" @click="getUpdate">
             <template v-slot:loading>
                 <q-spinner />
             </template>

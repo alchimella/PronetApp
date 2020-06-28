@@ -1,21 +1,24 @@
 <template>
-    <q-footer class="bg-primary-dark2 q-pb-md" elevated>
-        <q-tabs no-caps switch-indicator active-color="primary" indicator-color="bg-next-blue2" class="text-grey" v-model="tab">
-            <q-route-tab to="/" exact>
-                <img class="q-mt-sm" style="width: 30px; height: 30px" src="../assets/home.png">
-                <span>Главная</span>
+    <q-footer class="l-footer q-pb-md no-shadow">
+        <q-tabs no-caps active-color="bg-qr-bg-button-selected" indicator-color="bg-qr-bg-button-active" class="text-grey" v-model="tab">
+            <q-route-tab name="/" to="/" exact>
+                <img style="width: 24px; height: 22px" src="../assets/wallet_icon.png">
+                <span>Кошелёк</span>
             </q-route-tab>
-            <q-route-tab to="/coupons" exact>
-                <img class="q-mt-sm" style="width: 48px; height: 30px" src="../assets/coupon.png">
-                <span>Талоны</span>
+            <q-route-tab name="coupons" to="/map" exact>
+                <img style="width: 19px; height: 24px" src="../assets/map.png">
+                <span>Карта АЗС</span>
             </q-route-tab>
-            <q-route-tab to="/cards" exact>
-                <img class="q-mt-sm" style="width: 48px; height: 30px" src="../assets/card.png">
-                <span>Карты</span>
+            <q-route-tab class="l-footer-qr-scan-tab" to="/qr" exact>
+                <img class="q-mt-sm q-mb-sm" style="width: 40px; height: 40px" src="../assets/qrcode-scan.png">
             </q-route-tab>
-            <q-route-tab to="/settings" exact>
-                <img class="q-mt-sm" style="width: 36px; height: 30px" src="../assets/settings.png">
-                <span>Настройки</span>
+            <q-route-tab name="cards" to="/coupons" exact>
+                <img style="width: 25px; height: 24px" src="../assets/discount_icon.png">
+                <span>Акции</span>
+            </q-route-tab>
+            <q-route-tab name="settings" to="/settings" exact>
+                <img style="width: 24px; height: 7px" src="../assets/more_icon.png">
+                <span>Ещё</span>
             </q-route-tab>
         </q-tabs>
     </q-footer>
@@ -24,10 +27,11 @@
 <script>
     export default {
         name: 'Footer',
+        props: ["clickedQRScan"],
 
         data() {
             return {
-
+                tab: ''
             }
         }
     }

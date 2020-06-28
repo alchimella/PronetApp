@@ -14,10 +14,9 @@ const routes = [
         children: [
             { path: '', component: () => import('pages/Index.vue') },
             { path: 'coupons', component: () => import('pages/Coupons.vue') },
-            { path: 'cards', component: () => import('pages/Cards.vue') },
-            { path: 'enter-code', component: () => import('pages/EnterCode.vue') },
+            { path: 'map', component: () => import('pages/Map.vue') },
             { path: 'settings', component: () => import('pages/Settings.vue') },
-            { path: 'ticket', component: () => import('pages/Ticket.vue') }
+            { path: 'qr', component: () => import('pages/QR.vue') }
         ]
     }
 ];
