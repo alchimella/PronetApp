@@ -10,7 +10,7 @@
   "cordova-plugin-file-transfer": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-file-transfer"
+      "id": "cordova-plugin-file-transfer@^1.7.1"
     },
     "is_top_level": true,
     "variables": {}
@@ -50,7 +50,7 @@
   "cordova-plugin-appversion": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-appversion"
+      "id": "cordova-plugin-appversion@^1.0.0"
     },
     "is_top_level": true,
     "variables": {}
@@ -58,7 +58,7 @@
   "cordova-plugin-device": {
     "source": {
       "type": "registry",
-      "id": "cordova-plugin-device"
+      "id": "cordova-plugin-device@^2.0.3"
     },
     "is_top_level": true,
     "variables": {}

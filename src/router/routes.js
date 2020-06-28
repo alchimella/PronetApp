@@ -3,6 +3,7 @@ const routes = [
         path: '/signup',
         component: () => import('layouts/SignUp.vue'),
         children: [
+            { path: 'privacy', component: () => import('pages/Privacy.vue') },
             { path: 'first-step', component: () => import('pages/SignUpFirstStep.vue') },
             { path: 'second-step', component: () => import('pages/SignUpSecondStep.vue') },
             { path: 'third-step', component: () => import('pages/SignUpThirdStep.vue') },

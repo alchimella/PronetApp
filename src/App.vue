@@ -21,7 +21,7 @@ export default {
   },
 
   mounted() {
-    let path = 'signup/first-step';
+    let path = 'signup/privacy';
 
     if (this.idrref || this.account) path = 'signup/third-step';
     // if (!localStorage.appVersion) {

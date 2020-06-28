@@ -1,6 +1,22 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
   module.exports = [
     {
+      "id": "cordova-plugin-appversion.RareloopAppVersion",
+      "file": "plugins/cordova-plugin-appversion/www/app-version.js",
+      "pluginId": "cordova-plugin-appversion",
+      "clobbers": [
+        "AppVersion"
+      ]
+    },
+    {
+      "id": "cordova-plugin-device.device",
+      "file": "plugins/cordova-plugin-device/www/device.js",
+      "pluginId": "cordova-plugin-device",
+      "clobbers": [
+        "device"
+      ]
+    },
+    {
       "id": "cordova-plugin-file.DirectoryEntry",
       "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
       "pluginId": "cordova-plugin-file",
@@ -196,39 +212,14 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "cordova.plugins.barcodeScanner"
       ]
-    },
-    {
-      "id": "cordova-plugin-apkInstaller.apkInstaller",
-      "file": "plugins/cordova-plugin-apkInstaller/www/apkInstaller.js",
-      "pluginId": "cordova-plugin-apkInstaller",
-      "clobbers": [
-        "apkInstaller"
-      ]
-    },
-    {
-      "id": "cordova-plugin-appversion.RareloopAppVersion",
-      "file": "plugins/cordova-plugin-appversion/www/app-version.js",
-      "pluginId": "cordova-plugin-appversion",
-      "clobbers": [
-        "AppVersion"
-      ]
-    },
-    {
-      "id": "cordova-plugin-device.device",
-      "file": "plugins/cordova-plugin-device/www/device.js",
-      "pluginId": "cordova-plugin-device",
-      "clobbers": [
-        "device"
-      ]
     }
   ];
   module.exports.metadata = {
+    "cordova-plugin-appversion": "1.0.0",
+    "cordova-plugin-device": "2.0.3",
     "cordova-plugin-file": "6.0.2",
     "cordova-plugin-file-transfer": "1.7.1",
-    "cordova-plugin-whitelist": "1.3.4",
     "cordova-plugin-qr-barcode-scanner": "8.0.3",
-    "cordova-plugin-apkInstaller": "1.1.1",
-    "cordova-plugin-appversion": "1.0.0",
-    "cordova-plugin-device": "2.0.3"
+    "cordova-plugin-whitelist": "1.3.4"
   };
 });
