@@ -3,40 +3,30 @@
         <Header />
 
         <div class="flex row justify-center content-center full-width">
-            <img src="../assets/avatar.png" alt="" style="width: 87px; height: 110px">
-            <h2 class="flex justify-center full-width">Ваш лицевой счет</h2>
-            <h1>{{ account }}</h1>
-            <h2 class="flex justify-center full-width">Введите пароль</h2>
-            <q-input class="full-width input" v-model="password" dark borderless :type="isPwd ? 'password' : 'text'" placeholder="Введите пароль">
-                <template v-slot:append>
-                <q-icon
-                    class="q-pr-lg"
-                    :name="isPwd ? 'visibility_off' : 'visibility'"
-                    @click="isPwd = !isPwd"
-                />
-                </template>
-            </q-input>
-        </div>
-
-        <div class="flex row justify-center content-end items-end full-width">
-            <q-btn class="q-mt-lg q-mb-lg call-button" size="lg" color="success-green2" round>
-                <a class="flex items-center" href="tel:+996550426964">
-                    <img class="button-icon" src="../assets/call.png">
-                </a>
-            </q-btn>
-            <h3 class="flex justify-center full-width">Служба поддержки</h3>
+            <h2 class="flex justify-center full-width q-mt-xl">Введите код</h2>
+            <div class="flex justify-center full-width" style="position: relative">
+                <label class="flex justify-center content-center items-center pin-label">{{ t1 }}</label>
+                <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t2 }}</label>
+                <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t3 }}</label>
+                <label class="flex justify-center content-center items-center q-ml-sm pin-label">{{ t4 }}</label>
+                <input class="full-width pin-input" pattern="\d*" maxlength="4" type="tel" v-model="pin" />
+            </div>
         </div>
 
         <div class="flex row justify-center items-end full-width">
             <h3 v-show="errorMessage.length > 0" class="q-pa-lg full-width">{{ errorMessage }}</h3>
-            <q-btn class="full-width submit-button" label="Авторизация" :loading="submitting" :disable="!isButtonActive" @click="singIn" no-caps />
+            <q-btn class="full-width submit-button" label="Завершить" :loading="submitting" :disable="!isButtonActive" @click="save" no-caps>
+                <template v-slot:loading>
+                    <q-spinner />
+                </template>
+            </q-btn>
         </div>
     </q-page>
 </template>
 
 <script>
     import Header from '../components/Header'
-    import { buildFillRequest } from '../boot/options';
+    import { buildFillRequest, buildLogonRequest } from '../boot/options';
 
     export default {
         name: "SignUpThirdStep",
@@ -44,63 +34,61 @@
 
         data() {
             return {
-                password: '',
-                errorMessage: '',
-                idrref: localStorage.idrref,
-                account: localStorage.account,
+                pin: '',
+                passwordRepeat: '',
+                check: false,
                 submitting: false,
                 isButtonActive: true,
+                errorMessage: '',
+                idrref: this.$config.userIdrref,
                 deviceId: device.uuid,
                 // deviceId: 'cb2a8213-9da2-4756-93ea-549ae7cfe6c1',
-                signature: 'a80ef6f574652d870113226ba0cbe72c',
-                isPwd: true
+                signature: 'a80ef6f574652d870113226ba0cbe72c'
             }
         },
 
         computed: {
-            getStatus: async function () {
-                this.errorMessage = '';
-
-                let query = `select * from _reference13 where _cid = '${this.deviceId}'`;
-                let envelope = buildFillRequest(query);
-
-                let options = {
-                    method: 'post',
-                    url: 'http://pn.pronet.kg:1072',
-                    data: envelope
-                };
-
-                let data = await this.$axios(options)
-                    .then(response => {
-                        let res = response.data.envelope.body.response.data[0]["_status"];
-
-                        if (res == 0) this.errorMessage = 'В ожидании';
-                        if (res == 2) this.errorMessage = 'Отклонено';
-                        if (res == 1) this.errorMessage = 'Принято';
-
-                        localStorage.status = res;
-                        return this.errorMessage;
-                    })
-                    .catch(err => {
-                        console.error('Произошла ошибка при запросе статуса терминала: ', JSON.stringify(err));
-                        this.errorMessage = 'Произошла ошибка при соединении с сервером'
-                    })
-
-                return data
+            t1: function () {
+                if (this.pin.length >= 1) {
+                    return '•'
+                } else {
+                    return ''
+                }
+            },
+            t2: function () {
+                if (this.pin.length >= 2) {
+                    return '•'
+                } else {
+                    return ''
+                }
+            },
+            t3: function () {
+                if (this.pin.length >= 3) {
+                    return '•'
+                } else {
+                    return ''
+                }
+            },
+            t4: function () {
+                if (this.pin.length == 4) {
+                    return '•'
+                } else {
+                    return ''
+                }
             }
         },
 
         methods: {
-            singIn: async function () {
+            save: async function () {
+                console.log('Запушен второй шаг регистрации');
+
                 this.submitting = true;
                 this.isButtonActive = false;
 
-                let message = '';
+                if (this.pin.length == 0 || this.pin.length < 4) {
+                    console.warn('Не заполено поле с кодом смс');
 
-                if (this.password.length == 0) {
-                    console.warn('Поле с паролем не заполнено');
-
-                    this.errorMessage = 'Заполните поле';
+                    this.errorMessage = 'Введите код с смс';
                     this.submitting = false;
                     this.isButtonActive = true;
                     return
@@ -108,30 +96,36 @@
 
                 let options = {
                     method: 'post',
-                    url: `http://pn.pronet.kg:1072/api/81a05d419edf445b9a1d4964eade2c01?op=3&idrref=${this.idrref}&passwd=${this.password}&signature=${this.signature}`,
+                    url: `http://pn.pronet.kg:1072/api/81a05d419edf445b9a1d4964eade2c01?op=2&idrref=${this.idrref}&pin=${this.pin}&signature=${this.signature}`,
                 };
 
                 this.$axios(options)
                     .then(response => {
-                        console.log('Авторизация прошела успешно', response);
+                        console.log('Второй шаг регистрации прошел успешно', response);
 
-                        let hasError = response.data.envelope.body.response.haserror;
-                        message = response.data.envelope.body.response.message;
+                        let data = response.data.envelope.body.response.data;
 
-                        if (hasError) throw new Error('Неверный пароль. Введите еще раз')
+                        if (data.length == 0) {
+                            this.errorMessage = 'Неверный пин код. Попробуйте снова'
+                            this.submitting = false;
+                            this.isButtonActive = true;
+                            return;
+                        }
 
                         let code = response.data.envelope.body.response.data._code;
                         this.$store.commit('setAccount', code)
-                        this.errorMessage = '';
                         this.submitting = false;
                         this.isButtonActive = true;
 
-                        this.$router.replace('/')
+                        localStorage.idrref = this.$config.userIdrref;
+                        localStorage.account = code;
+
+                        this.$router.replace('fourth-step')
                     })
                     .catch(err => {
-                        console.error('Произошла ошибка при авторизации: ', err);
+                        console.error('Произошла ошибка при втором шаге регистрации: ', JSON.stringify(err));
 
-                        this.errorMessage = message;
+                        this.errorMessage = 'Произошла ошибка при соединении с сервером'
                         this.submitting = false;
                         this.isButtonActive = true;
                     })

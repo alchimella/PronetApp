@@ -5,7 +5,8 @@ const routes = [
         children: [
             { path: 'first-step', component: () => import('pages/SignUpFirstStep.vue') },
             { path: 'second-step', component: () => import('pages/SignUpSecondStep.vue') },
-            { path: 'third-step', component: () => import('pages/SignUpThirdStep.vue') }
+            { path: 'third-step', component: () => import('pages/SignUpThirdStep.vue') },
+            { path: 'fourth-step', component: () => import('pages/SignUpFourthStep.vue') }
         ]
     },
     {

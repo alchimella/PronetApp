@@ -32,6 +32,11 @@ export default {
                     _this.isScaned = true;
                     _this.$emit('spinner', _this.isScaned)
 
+                    if (result.cancelled) {
+                        _this.isScaned = false;
+                        _this.$emit('spinner', _this.isScaned)
+                    }
+
                     if (code) {
                         let options = {
                             method: 'post',
@@ -46,6 +51,9 @@ export default {
                 },
                 function (error) {
                     // alert('Scanning failed: ' + error)
+                    alert(error)
+                    _this.isScaned = false;
+                    _this.$emit('spinner', _this.isScaned)
                 },
                 {
                     preferFrontCamera: false, // iOS and Android
@@ -53,7 +61,7 @@ export default {
                     showTorchButton: true, // iOS and Android
                     torchOn: false, // Android, launch with the torch switched on (if available)
                     saveHistory: true, // Android, save scan history (default false)
-                    prompt: 'Place a barcode inside the scan area', // Android
+                    prompt: '', // Android
                     resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
                     formats: 'QR_CODE,EAN_8,EAN_13,CODE_128', // default: all but PDF_417 and RSS_EXPANDED
                     orientation: 'portrait', // Android only (portrait|landscape), default unset so it rotates with the device
@@ -72,7 +80,10 @@ export default {
                     console.log('Найден талон с номером - ' + code, data);
                     let result = data.filter(item => item._accumreg1_amount > 0);
                     this.$store.dispatch('loadCoupons', result);
-                } else console.log('Нет данных', data);
+                } else {
+                    console.log('Нет данных', data);
+                    alert('Талонов с кодом - ' + code + ' не найдено!')
+                }
             } catch (e) {
                 console.log('Произошла ошибка при поиске талона: ', err);
             }
