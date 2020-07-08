@@ -82,8 +82,8 @@
                     .then(response => {
                         console.log('Первый шаг регистрацию терминала прошел успешно. Ожидается подтверждение!', response);
 
-                        let data = response.data.envelope.body.response.data
-                        let idrref = response.data.envelope.body.response.data._idrref;
+                        let data = response.data.data
+                        let idrref = response.data.data[0]._idrref;
                         if (data.length != 0) {
                             this.$config.userIdrref = idrref;
                             this.submitting = false;
@@ -94,7 +94,7 @@
                         }
                     })
                     .catch(err => {
-                        console.error('Произошла ошибка при первом регистрации терминала: ', JSON.stringify(err));
+                        console.error('Произошла ошибка при первом регистрации терминала: ', err);
 
                         this.errorMessage = 'Произошла ошибка при соединении с сервером';
                         this.submitting = false;
@@ -115,14 +115,13 @@
                 this.$axios(options)
                     .then(response => {
                         console.log('Первый шаг перерегистрации пользователя прошел успешно. Ожидается подтверждение!', response);
-                        let idrref = response.data.envelope.body.response.data._idrref;
-                        let message = response.data.envelope.body.response.message;
+                        let idrref = response.data.data[0]._idrref;
+                        let message = response.data.message;
                         if (idrref) {
                             this.$config.userIdrref = idrref;
                             this.submitting = false;
                             this.isButtonActive = true;
                             this.$router.replace('third-step')
-                            this.$store.commit('setUserExist', false);
                         } else {
                             this.submitting = false;
                             this.isButtonActive = true;
@@ -131,7 +130,7 @@
                         }
                     })
                     .catch(err => {
-                        console.error('Произошла ошибка при первом регистрации терминала: ', JSON.stringify(err));
+                        console.error('Произошла ошибка при первом регистрации терминала: ', err);
                         this.errorMessage = 'Произошла ошибка при соединении с сервером';
                         this.submitting = false;
                         this.isButtonActive = true;
@@ -141,6 +140,7 @@
 
         beforeDestroy() {
             this.$store.commit('setErrorMessage', '');
+            this.$store.commit('setUserExist', false);
         }
     }
 </script>

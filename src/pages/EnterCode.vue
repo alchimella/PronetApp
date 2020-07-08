@@ -56,7 +56,7 @@ export default {
 
                 this.$axios(options)
                     .then(response => {
-                        let data = response.data.envelope.body.response.data;
+                        let data = response.data.data;
 
                         if (data.length) {
                             console.log('Найден талон с номером - ' + this.code, data);

@@ -82,12 +82,12 @@
                     .then(response => {
                         console.log('Авторизация прошела успешно', response);
 
-                        let hasError = response.data.envelope.body.response.haserror;
-                        message = response.data.envelope.body.response.message;
+                        let error = response.data.error;
+                        message = response.data.message;
 
-                        if (hasError) throw new Error('Неверный пароль. Введите еще раз')
+                        if (error == 3) throw new Error('Неверный пароль. Введите еще раз')
 
-                        let code = response.data.envelope.body.response.data._code;
+                        let code = response.data.data[0]._code;
                         this.$store.commit('setAccount', code)
                         this.errorMessage = '';
                         this.submitting = false;

@@ -32,7 +32,7 @@
             <div class="flex row justify-start full-width">
 <!--                <input class="col-3 input" v-model="code" type="text" pattern="\d*" />-->
                 <label class="flex col-2 content-center items-center" style="font-size: 20px; color: white">{{code}}</label>
-                <input class="col-8 input" v-model="phone" type="text" pattern="\d*" placeholder="000 000 000 " />
+                <q-input class="col-10 input" v-model="phone" type="text" pattern="\d*" dark borderless placeholder="000 000 000 " />
             </div>
         </div>
 
@@ -107,17 +107,19 @@
                     .then(response => {
                         console.log('Первый шаг регистрацию терминала прошел успешно. Ожидается подтверждение!', response);
 
-                        let data = response.data.envelope.body.response.data
-                        let idrref = response.data.envelope.body.response.data._idrref;
+                        let error = response.data.error
 
                         this.$store.commit('setPhone', code + this.phone);
 
-                        if (data.length != 0) {
+                        if (error == 0) {
+                            let idrref = response.data.data[0]._idrref;
+
                             this.$config.userIdrref = idrref;
                             this.submitting = false;
                             this.isButtonActive = true;
                             this.$router.replace('second-step')
-                        } else {
+                        }
+                        if (error == 2) {
                             this.submitting = false;
                             this.isButtonActive = true;
                             this.$store.commit('setErrorMessage', 'Данный номер телефона уже зарегистрирован');
@@ -126,7 +128,7 @@
                         }
                     })
                     .catch(err => {
-                        console.error('Произошла ошибка при первом регистрации терминала: ', JSON.stringify(err));
+                        console.error('Произошла ошибка при первом регистрации терминала: ', err);
 
                         this.errorMessage = 'Произошла ошибка при соединении с сервером';
                         this.submitting = false;

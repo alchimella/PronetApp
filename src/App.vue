@@ -21,12 +21,12 @@ export default {
     let path = 'signup/first-step';
 
     if (this.idrref || this.account) path = 'signup/fourth-step';
-    // if (!localStorage.appVersion) {
-    //     this.$config.userCurrentAppVersion = AppVersion.version
-    //     localStorage.appVersion = AppVersion.version
-    // } else {
-    //     this.$config.userCurrentAppVersion = localStorage.appVersion
-    // }
+    if (!localStorage.appVersion) {
+        this.$config.userCurrentAppVersion = AppVersion.version
+        localStorage.appVersion = AppVersion.version
+    } else {
+        this.$config.userCurrentAppVersion = localStorage.appVersion
+    }
 
     this.$router.replace({'path': path})
   }

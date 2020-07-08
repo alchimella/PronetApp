@@ -103,7 +103,7 @@
                     .then(response => {
                         console.log('Второй шаг регистрации прошел успешно', response);
 
-                        let data = response.data.envelope.body.response.data;
+                        let data = response.data.data;
 
                         if (data.length == 0) {
                             this.errorMessage = 'Неверный пин код. Попробуйте снова'
@@ -112,7 +112,7 @@
                             return;
                         }
 
-                        let code = response.data.envelope.body.response.data._code;
+                        let code = response.data.data[0]._code;
                         this.$store.commit('setAccount', code)
                         this.submitting = false;
                         this.isButtonActive = true;
@@ -123,7 +123,7 @@
                         this.$router.replace('fourth-step')
                     })
                     .catch(err => {
-                        console.error('Произошла ошибка при втором шаге регистрации: ', JSON.stringify(err));
+                        console.error('Произошла ошибка при втором шаге регистрации: ', err);
 
                         this.errorMessage = 'Произошла ошибка при соединении с сервером'
                         this.submitting = false;

@@ -45,7 +45,7 @@
                     .then(response => {
                         console.log('Проверка версий приложения на сервере прошла успешно', response);
                         let currentVersion = this.$config.userCurrentAppVersion
-                        let data = response.data.envelope.body.response.data;
+                        let data = response.data.data;
 
                         if (data[0] && data[0]['_ver'] > currentVersion) {
                             console.warn(data)

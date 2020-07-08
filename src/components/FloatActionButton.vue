@@ -74,7 +74,7 @@ export default {
         getCoupons: async function (options, code) {
             try {
                 let response = await this.$axios(options);
-                let data = response.data.envelope.body.response.data;
+                let data = response.data.data;
 
                 if (data.length) {
                     console.log('Найден талон с номером - ' + code, data);
